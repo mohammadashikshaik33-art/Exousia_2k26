@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+<html class="dark scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EXOUSIA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Geist:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-low": "#1c1b1b",
+                      "secondary-fixed-dim": "#ffb4a8",
+                      "outline-variant": "#5a403c",
+                      "on-secondary": "#680201",
+                      "on-background": "#e5e2e1",
+                      "inverse-primary": "#b52619",
+                      "on-tertiary": "#313030",
+                      "surface-dim": "#131313",
+                      "on-surface": "#e5e2e1",
+                      "on-secondary-fixed": "#410000",
+                      "on-primary-container": "#ff907f",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "outline": "#aa8984",
+                      "primary-fixed-dim": "#ffb4a8",
+                      "surface-bright": "#3a3939",
+                      "on-error-container": "#ffdad6",
+                      "primary": "#ffb4a8",
+                      "tertiary-container": "#434242",
+                      "surface-variant": "#353534",
+                      "tertiary-fixed": "#e5e2e1",
+                      "on-tertiary-fixed-variant": "#474746",
+                      "on-primary-fixed-variant": "#920703",
+                      "on-secondary-fixed-variant": "#891d12",
+                      "surface-container-high": "#2a2a2a",
+                      "surface-container-highest": "#353534",
+                      "surface-tint": "#ffb4a8",
+                      "surface-container": "#201f1f",
+                      "primary-fixed": "#ffdad4",
+                      "secondary-container": "#8c1f14",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "on-primary": "#690000",
+                      "background": "#131313",
+                      "primary-container": "#8b0000",
+                      "tertiary": "#c8c6c5",
+                      "inverse-on-surface": "#313030",
+                      "on-error": "#690005",
+                      "surface": "#131313",
+                      "on-secondary-container": "#ff9f90",
+                      "inverse-surface": "#e5e2e1",
+                      "secondary-fixed": "#ffdad4",
+                      "secondary": "#ffb4a8",
+                      "on-tertiary-container": "#b1aeae",
+                      "on-surface-variant": "#e3beb8",
+                      "surface-container-lowest": "#0e0e0e",
+                      "error": "#ffb4ab",
+                      "error-container": "#93000a",
+                      "on-primary-fixed": "#410000"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "section-gap": "120px",
+                      "gutter": "24px",
+                      "unit": "8px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "headline-xl": ["Bebas Neue"],
+                      "headline-lg-mobile": ["Bebas Neue"],
+                      "body-md": ["Geist"],
+                      "label-mono": ["JetBrains Mono"],
+                      "headline-lg": ["Bebas Neue"],
+                      "body-lg": ["Geist"]
+              },
+              "fontSize": {
+                      "headline-xl": ["72px", {"lineHeight": "72px", "letterSpacing": "0.1em", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["36px", {"lineHeight": "40px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                      "label-mono": ["12px", {"lineHeight": "16px", "letterSpacing": "0.15em", "fontWeight": "500"}],
+                      "headline-lg": ["48px", {"lineHeight": "48px", "letterSpacing": "0.05em", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e; /* surface-container-lowest */
+            color: #e5e2e1; /* on-surface */
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: 'Geist', sans-serif;
+        }
+
+        /* Film Grain Overlay */
+        .film-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Intro Sequence Styles */
+        #intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .shader-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .title-container {
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .title-letter {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(1.1) translateY(20px);
+            transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            /* Font will be applied via tailwind classes in HTML */
+        }
+        
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+            color: #ffb4a8; /* primary */
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            opacity: 0;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+            opacity: 0;
+        }
+        
+        .is-glitching .glitch-text::before,
+        .is-glitching .glitch-text::after {
+            opacity: 1;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(66px, 9999px, 86px, 0); transform: skew(0.5deg); }
+            5% { clip: rect(54px, 9999px, 12px, 0); transform: skew(0.2deg); }
+            10% { clip: rect(78px, 9999px, 51px, 0); transform: skew(0.6deg); }
+            15% { clip: rect(93px, 9999px, 11px, 0); transform: skew(0.9deg); }
+            20% { clip: rect(23px, 9999px, 84px, 0); transform: skew(0.1deg); }
+            25% { clip: rect(100px, 9999px, 95px, 0); transform: skew(0.8deg); }
+            30% { clip: rect(32px, 9999px, 45px, 0); transform: skew(0.4deg); }
+            35% { clip: rect(81px, 9999px, 20px, 0); transform: skew(0.7deg); }
+            40% { clip: rect(4px, 9999px, 66px, 0); transform: skew(0.3deg); }
+            45% { clip: rect(59px, 9999px, 10px, 0); transform: skew(0.5deg); }
+            50% { clip: rect(28px, 9999px, 73px, 0); transform: skew(0.2deg); }
+            55% { clip: rect(91px, 9999px, 34px, 0); transform: skew(0.8deg); }
+            60% { clip: rect(15px, 9999px, 89px, 0); transform: skew(0.1deg); }
+            65% { clip: rect(70px, 9999px, 42px, 0); transform: skew(0.6deg); }
+            70% { clip: rect(48px, 9999px, 6px, 0); transform: skew(0.4deg); }
+            75% { clip: rect(98px, 9999px, 57px, 0); transform: skew(0.9deg); }
+            80% { clip: rect(11px, 9999px, 82px, 0); transform: skew(0.3deg); }
+            85% { clip: rect(84px, 9999px, 25px, 0); transform: skew(0.7deg); }
+            90% { clip: rect(39px, 9999px, 71px, 0); transform: skew(0.2deg); }
+            95% { clip: rect(62px, 9999px, 18px, 0); transform: skew(0.5deg); }
+            100% { clip: rect(9px, 9999px, 94px, 0); transform: skew(0.8deg); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(45px, 9999px, 12px, 0); transform: skew(0.3deg); }
+            5% { clip: rect(92px, 9999px, 78px, 0); transform: skew(0.8deg); }
+            10% { clip: rect(18px, 9999px, 54px, 0); transform: skew(0.1deg); }
+            15% { clip: rect(71px, 9999px, 9px, 0); transform: skew(0.6deg); }
+            20% { clip: rect(33px, 9999px, 86px, 0); transform: skew(0.4deg); }
+            25% { clip: rect(89px, 9999px, 21px, 0); transform: skew(0.9deg); }
+            30% { clip: rect(6px, 9999px, 63px, 0); transform: skew(0.2deg); }
+            35% { clip: rect(57px, 9999px, 40px, 0); transform: skew(0.7deg); }
+            40% { clip: rect(96px, 9999px, 15px, 0); transform: skew(0.5deg); }
+            45% { clip: rect(24px, 9999px, 75px, 0); transform: skew(0.3deg); }
+            50% { clip: rect(79px, 9999px, 32px, 0); transform: skew(0.8deg); }
+            55% { clip: rect(11px, 9999px, 90px, 0); transform: skew(0.1deg); }
+            60% { clip: rect(68px, 9999px, 47px, 0); transform: skew(0.6deg); }
+            65% { clip: rect(42px, 9999px, 8px, 0); transform: skew(0.4deg); }
+            70% { clip: rect(94px, 9999px, 51px, 0); transform: skew(0.9deg); }
+            75% { clip: rect(19px, 9999px, 83px, 0); transform: skew(0.2deg); }
+            80% { clip: rect(81px, 9999px, 26px, 0); transform: skew(0.7deg); }
+            85% { clip: rect(36px, 9999px, 69px, 0); transform: skew(0.5deg); }
+            90% { clip: rect(53px, 9999px, 14px, 0); transform: skew(0.3deg); }
+            95% { clip: rect(100px, 9999px, 98px, 0); transform: skew(0.8deg); }
+            100% { clip: rect(27px, 9999px, 41px, 0); transform: skew(0.1deg); }
+        }
+
+        .falling {
+            animation: fallAndSpin 1.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        }
+
+        @keyframes fallAndSpin {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(150vh) rotate(var(--rot)) scale(0.5); opacity: 0; }
+        }
+
+        /* Main Page Styles */
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+            min-height: 100vh;
+            transition: opacity 2s ease-in;
+            position: relative;
+        }
+        
+        .main-visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .hero-title-drop {
+            transform: translateY(-150vh);
+            transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .hero-title-settled {
+            transform: translateY(0);
+        }
+        
+        /* Navigation (TopAppBar Shared Component based) */
+        .top-nav {
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.3s;
+        }
+        
+        .top-nav:hover, .nav-scrolled {
+            transform: translateY(0);
+        }
+
+        /* Bloom Effects */
+        .bloom-glow {
+            text-shadow: 0 0 15px rgba(255, 180, 168, 0.4);
+        }
+        
+        .hover-bloom:hover, .nav-active {
+            text-shadow: 0 0 20px rgba(255, 180, 168, 0.8);
+            color: #ffb4a8 !important;
+            opacity: 1 !important;
+        }
+
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface">
+<div class="film-grain"></div>
+
+<!-- Intro Sequence -->
+<div id="intro-container">
+<div class="title-container" id="intro-title-container">
+<!-- Letters injected via JS for fine control -->
+<div class="font-headline-xl text-headline-xl md:text-[120px] md:leading-[120px] tracking-widest text-primary font-bold cursor-pointer glitch-text" data-text="EXOUSIA" id="intro-title">
+<!-- Spans created in JS -->
+</div>
+<p class="absolute left-1/2 -translate-x-1/2 mt-8 font-label-mono text-label-mono text-on-surface-variant opacity-0 transition-opacity duration-1000 tracking-[0.3em] uppercase" id="click-hint">Initialize Sequence</p>
+</div>
+</div>
+<!-- Main Content -->
+<div id="main-content">
+<!-- TopAppBar (from JSON) -->
+<nav class="top-nav fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 bg-gradient-to-b from-surface-container-lowest to-transparent" id="main-nav">
+<div class="flex items-center gap-4">
+<span aria-hidden="true" class="material-symbols-outlined text-primary text-2xl">waves</span>
+<span class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-tighter">EXOUSIA</span>
+</div>
+<div class="hidden md:flex items-center space-x-8 font-label-mono text-label-mono nav-links">
+<a class="text-primary opacity-70 hover-bloom transition-all duration-300 nav-active" href="#home">HOME</a>
+<a class="text-on-surface opacity-70 hover-bloom transition-all duration-300" href="#events">EVENTS</a>
+<a class="text-on-surface opacity-70 hover-bloom transition-all duration-300" href="#about">ABOUT</a>
+<a class="text-on-surface opacity-70 hover-bloom transition-all duration-300" href="#campus">CAMPUS</a>
+<a class="text-on-surface opacity-70 hover-bloom transition-all duration-300" href="#contact">CONTACT</a>
+</div>
+<button class="hidden md:block border border-primary text-primary px-6 py-2 font-label-mono text-label-mono uppercase hover:bg-primary/20 hover:shadow-[0_0_15px_rgba(255,180,168,0.4)] transition-all duration-300" onclick="document.getElementById('register').scrollIntoView({behavior: 'smooth'})">
+                REGISTER
+            </button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Hero Section -->
+<section class="min-h-screen relative flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop pt-24 overflow-hidden section-observe" id="home">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center opacity-30 mix-blend-luminosity" data-alt="A cinematic, wide-angle establishing shot of a massive, brutalist research facility emerging from dense, low-hanging atmospheric grey fog. The lighting is low-key, with piercing crimson warning lights glowing through the mist. The architecture is sharp, monolithic, and imposing, casting long, dramatic shadows. The overall aesthetic feels like a high-stakes, volatile scientific anomaly site at dusk." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCkDXlXb8zvQJeQArJQHk4t9FppnXUfsUOTyhFqIkBOmtYsNsBce-aHQuzgqjSYEDAgtdtj2SXSKXsktmwkWEIMLN_loCknqvcKoG7rKP6NZ8rTnnXM7gtwrlc7WRywViGP6s-4jEPNyl69Qd8lu_LuVX-cQEgbzzGJ3fQsj0z5cPEzCNQdrmoSUk4wiaKn0TYZoffDQPeOIWu1ZURhAITt1LZw8W7hEsHiFcK_GGbDAlHlGHZGLk')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/80 to-transparent"></div>
+</div>
+<div class="z-10 text-center relative w-full flex flex-col items-center">
+<h1 class="font-headline-xl text-headline-xl md:text-[150px] md:leading-[140px] text-primary tracking-[0.15em] font-bold glitch-text hero-title-drop bloom-glow" data-text="EXOUSIA" id="hero-title">EXOUSIA</h1>
+<div class="mt-8 max-w-2xl mx-auto opacity-0 translate-y-4 transition-all duration-1000 delay-500" id="hero-subtitle">
+<p class="font-body-md md:font-body-lg text-body-md md:text-body-lg text-on-surface-variant font-light mb-8">
+                        System integrity compromised. Anomaly detection active. Terminal access granted to sector 7G.
+                    </p>
+<div class="flex gap-4 justify-center">
+<button class="border border-primary text-primary px-8 py-3 font-label-mono text-label-mono uppercase hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,180,168,0.3)] transition-all duration-300 relative overflow-hidden group" onclick="document.getElementById('events').scrollIntoView({behavior: 'smooth'})">
+<span class="relative z-10 group-hover:animate-pulse">EXPLORE EVENTS</span>
+</button>
+<button class="border border-outline-variant text-on-surface-variant px-8 py-3 font-label-mono text-label-mono uppercase hover:bg-outline-variant/20 hover:text-on-surface transition-all duration-300" onclick="document.getElementById('register').scrollIntoView({behavior: 'smooth'})">
+                            REGISTER
+                        </button>
+</div>
+</div>
+</div>
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-50 animate-pulse">
+<span class="font-label-mono text-[10px] text-primary mb-2 tracking-widest">SCROLL TO DESCEND</span>
+<span class="material-symbols-outlined text-primary">arrow_downward</span>
+</div>
+</section>
+<!-- Events Section -->
+<section class="min-h-screen py-section-gap px-margin-mobile md:px-margin-desktop relative section-observe" id="events">
+<div class="relative z-10 max-w-7xl mx-auto">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary tracking-wider mb-12 bloom-glow">SYSTEM LOG: EVENTS</h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Day 1 -->
+<div class="md:col-span-8 bg-surface-container border border-outline-variant/30 p-8 hover:border-primary/50 transition-colors duration-500 group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+<span class="material-symbols-outlined text-[100px] text-primary">science</span>
+</div>
+<h3 class="font-label-mono text-on-surface-variant tracking-widest mb-4">DAY 01 / INITIATION</h3>
+<h4 class="font-headline-lg text-on-surface mb-4">SYNTHETIC INTELLIGENCE SYMPOSIUM</h4>
+<p class="font-body-md text-on-surface-variant mb-6">A deep dive into neural networks, artificial consciousness, and the ethical boundaries of machine learning.</p>
+<button class="text-primary font-label-mono hover:text-white transition-colors flex items-center gap-2">
+                    ACCESS DETAILS <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Spot Events -->
+<div class="md:col-span-4 bg-surface-container border border-outline-variant/30 p-8 hover:border-primary/50 transition-colors duration-500 flex flex-col justify-between">
+<div>
+<h3 class="font-label-mono text-on-surface-variant tracking-widest mb-4">ONGOING</h3>
+<h4 class="font-headline-lg text-on-surface mb-2">SPOT ANOMALIES</h4>
+<p class="font-body-md text-on-surface-variant">Spontaneous tech challenges scattered throughout the facility.</p>
+</div>
+<button class="text-primary font-label-mono hover:text-white transition-colors flex items-center gap-2 mt-6">
+                    VIEW MAP <span class="material-symbols-outlined text-sm">map</span>
+</button>
+</div>
+<!-- Day 2 -->
+<div class="md:col-span-12 bg-surface-container border border-outline-variant/30 p-8 hover:border-primary/50 transition-colors duration-500 mt-gutter relative">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<h3 class="font-label-mono text-on-surface-variant tracking-widest mb-4">DAY 02 / CULMINATION</h3>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div>
+<h4 class="font-headline-lg text-on-surface mb-4">HACKATHON: BREACH</h4>
+<p class="font-body-md text-on-surface-variant max-w-2xl">A 24-hour endurance test of coding, problem-solving, and system manipulation. Survive the night, bypass the firewalls, and claim the core.</p>
+</div>
+<button class="border border-primary text-primary px-6 py-2 font-label-mono hover:bg-primary/10 transition-all whitespace-nowrap">
+                        ENTER TEAM
+                     </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- About Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop relative bg-surface-container-low/50 section-observe" id="about">
+<div class="relative z-10 max-w-4xl mx-auto text-center">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary tracking-wider mb-8 bloom-glow">THE DIRECTIVE</h2>
+<p class="font-body-lg text-on-surface-variant mb-12 leading-relaxed">
+            EXOUSIA is not a festival; it is an experiment. A convergence of the brightest analytical minds tasked with unraveling the fabric of conventional technology. We exist in the margins of innovation, where code meets chaos.
+        </p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+<div class="border-l border-primary/30 pl-4">
+<span class="material-symbols-outlined text-primary mb-2">memory</span>
+<h4 class="font-label-mono text-on-surface mb-2">PROCESSING</h4>
+<p class="font-body-md text-on-surface-variant text-sm">Over 50+ hours of continuous intellectual engagement and technical workshops.</p>
+</div>
+<div class="border-l border-primary/30 pl-4">
+<span class="material-symbols-outlined text-primary mb-2">group</span>
+<h4 class="font-label-mono text-on-surface mb-2">SUBJECTS</h4>
+<p class="font-body-md text-on-surface-variant text-sm">1000+ participants from leading technological institutes across the grid.</p>
+</div>
+<div class="border-l border-primary/30 pl-4">
+<span class="material-symbols-outlined text-primary mb-2">emoji_events</span>
+<h4 class="font-label-mono text-on-surface mb-2">REWARDS</h4>
+<p class="font-body-md text-on-surface-variant text-sm">Substantial capital injections and exclusive hardware for successful anomaly containment.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Campus Section -->
+<section class="min-h-[80vh] py-section-gap px-margin-mobile md:px-margin-desktop relative section-observe" id="campus">
+<div class="relative z-10 max-w-7xl mx-auto">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary tracking-wider mb-12 bloom-glow">SECTOR MAP</h2>
+<div class="aspect-video bg-surface-container border border-outline-variant/30 flex items-center justify-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgwVjB6bTIwIDIwYTEgMSAwIDEgMCAwLTJ2MmEyIDIgMCAxIDEgMCA0djJhNCA0IDAgMSAwIDAtOHYyYTIgMiAwIDEgMSAwIDR2MmExIDEgMCAxIDAgMC0yeiIgZmlsbD0iI2ZmYjRhOCIgZmlsbC1vcGFjaXR5PSIwLjA1IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-30"></div>
+<div class="text-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-4 group-hover:text-primary transition-colors">satellite_alt</span>
+<p class="font-label-mono text-on-surface-variant tracking-widest uppercase">Initializing Topographic Data...</p>
+<p class="font-label-mono text-[10px] text-primary mt-2">[MAP RENDER PENDING SITE CLEARANCE]</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop relative bg-surface-container-low/50 section-observe" id="contact">
+<div class="relative z-10 max-w-4xl mx-auto">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-primary tracking-wider mb-12 bloom-glow">COMMUNICATIONS LINK</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div>
+<h3 class="font-label-mono text-on-surface-variant mb-6 border-b border-outline-variant/30 pb-2">PRIMARY CHANNELS</h3>
+<div class="space-y-4">
+<p class="font-body-md text-on-surface flex items-center gap-4 hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">mail</span> transmit@exousia.net
+                    </p>
+<p class="font-body-md text-on-surface flex items-center gap-4 hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">call</span> +1 (555) 019-8472
+                    </p>
+</div>
+</div>
+<div>
+<h3 class="font-label-mono text-on-surface-variant mb-6 border-b border-outline-variant/30 pb-2">TRANSMIT MESSAGE</h3>
+<form class="space-y-4">
+<input class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="IDENTIFICATION STR" type="text"/>
+<textarea class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="PAYLOAD..." rows="4"></textarea>
+<button class="w-full border border-primary text-primary py-3 font-label-mono hover:bg-primary/10 transition-colors uppercase tracking-widest" type="button">
+                        EXECUTE TRANSMISSION
+                    </button>
+</form>
+</div>
+</div>
+</div>
+</section>
+<!-- Register Section -->
+<section class="min-h-[50vh] flex items-center justify-center py-section-gap px-margin-mobile md:px-margin-desktop relative section-observe border-t border-outline-variant/20" id="register">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none"></div>
+<div class="relative z-10 text-center w-full max-w-3xl">
+<h2 class="font-headline-xl text-headline-xl md:text-[100px] text-primary tracking-widest mb-6 glitch-text bloom-glow" data-text="INITIALIZE">INITIALIZE</h2>
+<p class="font-body-lg text-on-surface-variant mb-10">Secure your access parameters. Capacity is strictly regulated.</p>
+<button class="bg-primary/10 border-2 border-primary text-primary px-12 py-5 font-headline-lg-mobile text-2xl uppercase tracking-widest hover:bg-primary hover:text-on-primary hover:shadow-[0_0_30px_rgba(255,180,168,0.6)] transition-all duration-500 group relative overflow-hidden">
+<span class="relative z-10 flex items-center gap-3">
+                SECURE CREDENTIALS <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</span>
+</button>
+</div>
+</section>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleContainer = document.getElementById('intro-title');
+            const clickHint = document.getElementById('click-hint');
+            const introContainer = document.getElementById('intro-container');
+            const mainContent = document.getElementById('main-content');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+            const nav = document.getElementById('main-nav');
+            const text = "EXOUSIA";
+            
+            // 1. Setup Intro Letters
+            titleContainer.innerHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                const span = document.createElement('span');
+                span.textContent = text[i];
+                span.className = 'title-letter';
+                // Store random rotation for falling animation
+                span.style.setProperty('--rot', `${(Math.random() - 0.5) * 720}deg`);
+                titleContainer.appendChild(span);
+            }
+
+            const letters = document.querySelectorAll('.title-letter');
+
+            // 2. Reveal Sequence
+            setTimeout(() => {
+                letters.forEach((letter, index) => {
+                    setTimeout(() => {
+                        // Digital reconstruction feel
+                        letter.style.opacity = '1';
+                        letter.style.filter = 'blur(0px)';
+                        letter.style.transform = 'scale(1) translateY(0)';
+                        
+                        // Small micro-flickers as it appears
+                        let flickers = 0;
+                        const flickerInterval = setInterval(() => {
+                            letter.style.opacity = Math.random() > 0.5 ? '0.5' : '1';
+                            flickers++;
+                            if (flickers > 5) {
+                                clearInterval(flickerInterval);
+                                letter.style.opacity = '1';
+                            }
+                        }, 50);
+
+                    }, index * 150 + Math.random() * 100); // Staggered, slightly random
+                });
+
+                // Show hint after letters are mostly revealed
+                setTimeout(() => {
+                    titleContainer.classList.add('is-glitching');
+                    clickHint.style.opacity = '0.5';
+                }, text.length * 150 + 800);
+
+            }, 1000); // Initial delay
+
+            // 3. Interaction & Transition
+            titleContainer.addEventListener('click', () => {
+                // Hard glitch
+                titleContainer.style.animation = 'glitch-anim 0.2s infinite';
+                clickHint.style.opacity = '0';
+                
+                setTimeout(() => {
+                    titleContainer.style.animation = 'none';
+                    
+                    // Collapse letters
+                    letters.forEach((letter, index) => {
+                        setTimeout(() => {
+                            letter.classList.add('falling');
+                        }, Math.random() * 200); // Random fall timing
+                    });
+
+                    // Fade out intro background, show main content
+                    setTimeout(() => {
+                        introContainer.style.opacity = '0';
+                        introContainer.style.pointerEvents = 'none'; // Prevent interaction while fading
+                        mainContent.classList.add('main-visible');
+                        
+                        // Drop in hero title
+                        setTimeout(() => {
+                            heroTitle.classList.add('hero-title-settled');
+                            
+                            // Fade in subtitle
+                            setTimeout(() => {
+                                heroSubtitle.style.opacity = '1';
+                                heroSubtitle.style.transform = 'translateY(0)';
+                                
+                                // Clean up intro DOM to save resources (keep shader bg by moving it to body or it's already fixed)
+                                setTimeout(() => {
+                                    // Remove just the intro UI, keep the container if it holds shader, but here shader is sibling or child?
+                                    // Modified: Intro container is separate from shader now.
+                                    document.getElementById('intro-title-container').remove();
+                                }, 1000);
+                            }, 800);
+                        }, 100);
+
+                    }, 800); // Wait for fall to progress
+
+                }, 400); // Duration of hard glitch
+            });
+            
+            // 4. Navbar scroll logic
+            window.addEventListener('scroll', () => {
+                if(window.scrollY > 100) {
+                    nav.classList.add('nav-scrolled');
+                    nav.classList.replace('bg-transparent', 'bg-surface-container-lowest/90');
+                    nav.classList.add('backdrop-blur-md');
+                } else {
+                    nav.classList.remove('nav-scrolled');
+                    nav.classList.replace('bg-surface-container-lowest/90', 'bg-transparent');
+                    nav.classList.remove('backdrop-blur-md');
+                }
+            });
+            
+            // Initial hover trigger for nav area
+            const navHitbox = document.createElement('div');
+            navHitbox.style.position = 'fixed';
+            navHitbox.style.top = '0';
+            navHitbox.style.left = '0';
+            navHitbox.style.width = '100%';
+            navHitbox.style.height = '80px';
+            navHitbox.style.zIndex = '40';
+            document.body.appendChild(navHitbox);
+            
+            navHitbox.addEventListener('mouseenter', () => {
+                if(window.scrollY <= 100 && mainContent.classList.contains('main-visible')) {
+                    nav.classList.add('nav-scrolled');
+                }
+            });
+            
+            nav.addEventListener('mouseleave', () => {
+                if(window.scrollY <= 100) {
+                    nav.classList.remove('nav-scrolled');
+                }
+            });
+
+            // 5. Scroll Spy for Navigation Active State
+            const sections = document.querySelectorAll('.section-observe');
+            const navLinks = document.querySelectorAll('.nav-links a');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5 // Trigger when 50% of the section is visible
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('nav-active', 'text-primary');
+                            link.classList.add('text-on-surface');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('nav-active', 'text-primary');
+                                link.classList.remove('text-on-surface');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                if(section.id) observer.observe(section);
+            });
+        });
+    </script>
+</body></html>

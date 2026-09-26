@@ -1,0 +1,61 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/verify", "destination": "/verify.html" },
+    { "source": "/coordinator", "destination": "/coordinator.html" },
+    { "source": "/feedback", "destination": "/feedback.html" },
+    { "source": "/audio-test", "destination": "/audio-test.html" },
+    { "source": "/api/auth/google/start", "destination": "/api/auth/google?action=start" },
+    { "source": "/api/auth/google/callback", "destination": "/api/auth/google?action=callback" },
+    { "source": "/api/cron/feedback-day1", "destination": "/api/cron/feedback?day=day1" },
+    { "source": "/api/cron/feedback-day2", "destination": "/api/cron/feedback?day=day2" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/feedback-day1",
+      "schedule": "0 13 30 9 *"
+    },
+    {
+      "path": "/api/cron/feedback-day2",
+      "schedule": "0 13 1 10 *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/audio/(.*)\\.mp3",
+      "headers": [
+        { "key": "Content-Type", "value": "audio/mpeg" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/audio/(.*)\\.ogg",
+      "headers": [
+        { "key": "Content-Type", "value": "audio/ogg" },
+        { "key": "Accept-Ranges", "value": "bytes" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}

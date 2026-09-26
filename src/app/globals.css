@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import "tailwindcss";
+
+:root {
+  /* Color System - Google Stitch Void / Anomaly Theme */
+  --bg-primary: #0e0e0e; /* surface-container-lowest */
+  --bg-secondary: #1c1b1b; /* surface-container-low */
+  --bg-tertiary: #201f1f; /* surface-container */
+  
+  --text-primary: #e5e2e1; /* on-surface */
+  --text-secondary: #e3beb8; /* on-surface-variant */
+  --text-tertiary: #5a403c; /* outline-variant */
+  
+  --accent: #ffb4a8; /* primary */
+  --accent-secondary: #8c1f14; /* secondary-container */
+  --accent-rgb: 255, 180, 168;
+  --border: #5a403c; /* outline-variant */
+  --grid-line: rgba(255, 180, 168, 0.015);
+  --glow-opacity: 0.25;
+
+  /* Font bindings */
+  --font-geist-sans: var(--font-geist-sans);
+  --font-geist-mono: var(--font-geist-mono);
+}
+
+@theme {
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+  --font-display: var(--font-bebas-neue), sans-serif;
+  --font-tech: var(--font-jetbrains-mono), monospace;
+
+  --color-primary: #ffb4a8;
+  --color-on-primary: #690000;
+  --color-primary-container: #8b0000;
+  --color-on-primary-container: #ff907f;
+  
+  --color-secondary: #ffb4a8;
+  --color-on-secondary: #680201;
+  --color-secondary-container: #8c1f14;
+  --color-on-secondary-container: #ff9f90;
+  
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container: #201f1f;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353534;
+  --color-surface-dim: #131313;
+  --color-surface-bright: #3a3939;
+  
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #e3beb8;
+  --color-outline: #aa8984;
+  --color-outline-variant: #5a403c;
+  
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-accent: var(--accent);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-border: var(--border);
+
+  /* Spacing values */
+  --spacing-margin-mobile: 20px;
+  --spacing-section-gap: 120px;
+  --spacing-gutter: 24px;
+  --spacing-unit: 8px;
+  --spacing-margin-desktop: 64px;
+  
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scanline: scanline 12s linear infinite;
+  --animate-glitch: glitch 0.25s ease-in-out infinite alternate;
+  --animate-crt-flicker: crtFlicker 0.15s ease-in-out infinite;
+  --animate-flicker: flicker 0.25s ease-in-out infinite alternate;
+}
+
+/* Base Body Styles */
+body {
+  background-color: #0e0e0e; /* surface-container-lowest */
+  color: #e5e2e1; /* on-surface */
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0e0e0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c1b1b;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffb4a8;
+}
+
+/* Technical EEE Grid Background */
+.eee-grid {
+  background-image: 
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+}
+
+/* Film Grain Overlay */
+.film-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Intro Sequence Styles */
+#intro-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transition: opacity 1s ease-in-out;
+}
+
+.title-container {
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  perspective: 1000px;
+}
+
+.title-letter {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.1) translateY(20px);
+  transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.glitch-text {
+  position: relative;
+  display: inline-block;
+  color: #ffb4a8; /* primary */
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -1px 0 red;
+  clip: rect(24px, 550px, 90px, 0);
+  animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  opacity: 0;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -1px 0 blue;
+  clip: rect(85px, 550px, 140px, 0);
+  animation: glitch-anim 2.5s infinite linear alternate-reverse;
+  opacity: 0;
+}
+
+.is-glitching .glitch-text::before,
+.is-glitching .glitch-text::after {
+  opacity: 1;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(66px, 9999px, 86px, 0); transform: skew(0.5deg); }
+  5% { clip: rect(54px, 9999px, 12px, 0); transform: skew(0.2deg); }
+  10% { clip: rect(78px, 9999px, 51px, 0); transform: skew(0.6deg); }
+  15% { clip: rect(93px, 9999px, 11px, 0); transform: skew(0.9deg); }
+  20% { clip: rect(23px, 9999px, 84px, 0); transform: skew(0.1deg); }
+  25% { clip: rect(100px, 9999px, 95px, 0); transform: skew(0.8deg); }
+  30% { clip: rect(32px, 9999px, 45px, 0); transform: skew(0.4deg); }
+  35% { clip: rect(81px, 9999px, 20px, 0); transform: skew(0.7deg); }
+  40% { clip: rect(4px, 9999px, 66px, 0); transform: skew(0.3deg); }
+  45% { clip: rect(59px, 9999px, 10px, 0); transform: skew(0.5deg); }
+  50% { clip: rect(28px, 9999px, 73px, 0); transform: skew(0.2deg); }
+  55% { clip: rect(91px, 9999px, 34px, 0); transform: skew(0.8deg); }
+  60% { clip: rect(15px, 9999px, 89px, 0); transform: skew(0.1deg); }
+  65% { clip: rect(70px, 9999px, 42px, 0); transform: skew(0.6deg); }
+  70% { clip: rect(48px, 9999px, 6px, 0); transform: skew(0.4deg); }
+  75% { clip: rect(98px, 9999px, 57px, 0); transform: skew(0.9deg); }
+  80% { clip: rect(11px, 9999px, 82px, 0); transform: skew(0.3deg); }
+  85% { clip: rect(84px, 9999px, 25px, 0); transform: skew(0.7deg); }
+  90% { clip: rect(39px, 9999px, 71px, 0); transform: skew(0.2deg); }
+  95% { clip: rect(62px, 9999px, 18px, 0); transform: skew(0.5deg); }
+  100% { clip: rect(9px, 9999px, 94px, 0); transform: skew(0.8deg); }
+}
+
+@keyframes glitch-anim-2 {
+  0% { clip: rect(45px, 9999px, 12px, 0); transform: skew(0.3deg); }
+  5% { clip: rect(92px, 9999px, 78px, 0); transform: skew(0.8deg); }
+  10% { clip: rect(18px, 9999px, 54px, 0); transform: skew(0.1deg); }
+  15% { clip: rect(71px, 9999px, 9px, 0); transform: skew(0.6deg); }
+  20% { clip: rect(33px, 9999px, 86px, 0); transform: skew(0.4deg); }
+  25% { clip: rect(89px, 9999px, 21px, 0); transform: skew(0.9deg); }
+  30% { clip: rect(6px, 9999px, 63px, 0); transform: skew(0.2deg); }
+  35% { clip: rect(57px, 9999px, 40px, 0); transform: skew(0.7deg); }
+  40% { clip: rect(96px, 9999px, 15px, 0); transform: skew(0.5deg); }
+  45% { clip: rect(24px, 9999px, 75px, 0); transform: skew(0.3deg); }
+  50% { clip: rect(79px, 9999px, 32px, 0); transform: skew(0.8deg); }
+  55% { clip: rect(11px, 9999px, 90px, 0); transform: skew(0.1deg); }
+  60% { clip: rect(68px, 9999px, 47px, 0); transform: skew(0.6deg); }
+  65% { clip: rect(42px, 9999px, 8px, 0); transform: skew(0.4deg); }
+  70% { clip: rect(94px, 9999px, 51px, 0); transform: skew(0.9deg); }
+  75% { clip: rect(19px, 9999px, 83px, 0); transform: skew(0.2deg); }
+  80% { clip: rect(81px, 9999px, 26px, 0); transform: skew(0.7deg); }
+  85% { clip: rect(36px, 9999px, 69px, 0); transform: skew(0.5deg); }
+  90% { clip: rect(53px, 9999px, 14px, 0); transform: skew(0.3deg); }
+  95% { clip: rect(100px, 9999px, 98px, 0); transform: skew(0.8deg); }
+  100% { clip: rect(27px, 9999px, 41px, 0); transform: skew(0.1deg); }
+}
+
+.falling {
+  animation: fallAndSpin 1.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+@keyframes fallAndSpin {
+  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(150vh) rotate(var(--rot)) scale(0.5); opacity: 0; }
+}
+
+/* Main Page Styles */
+#main-content {
+  opacity: 0;
+  visibility: hidden;
+  min-height: 100vh;
+  transition: opacity 2s ease-in;
+  position: relative;
+}
+
+.main-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.hero-title-drop {
+  transform: translateY(-150vh);
+  transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hero-title-settled {
+  transform: translateY(0);
+}
+
+/* Navigation */
+.top-nav {
+  transform: translateY(-100%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.3s;
+}
+
+.top-nav:hover, .nav-scrolled {
+  transform: translateY(0);
+}
+
+/* Bloom Effects */
+.bloom-glow {
+  text-shadow: 0 0 15px rgba(255, 180, 168, 0.4);
+}
+
+.hover-bloom:hover, .nav-active {
+  text-shadow: 0 0 20px rgba(255, 180, 168, 0.8);
+  color: #ffb4a8 !important;
+  opacity: 1 !important;
+}
+
+/* CRT Screen Subtle Flicker Animation */
+@keyframes crtFlicker {
+  0% { opacity: 0.975; }
+  50% { opacity: 1; }
+  100% { opacity: 0.985; }
+}
+
+.crt-flicker {
+  animation: crtFlicker 0.15s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.82; filter: brightness(0.85) drop-shadow(0 0 1px rgba(255, 180, 168, 0.35)); }
+  50% { opacity: 1; filter: brightness(1.25) drop-shadow(0 0 8px rgba(255, 180, 168, 0.95)); }
+  100% { opacity: 0.88; filter: brightness(0.95) drop-shadow(0 0 3px rgba(255, 180, 168, 0.5)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-flicker {
+    animation: none;
+  }
+}

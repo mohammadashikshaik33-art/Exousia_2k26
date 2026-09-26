@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EXOUSIA 2K26 — Event Coordinator Desk</title>
+
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <link rel="stylesheet" href="/src/style.css"/>
+</head>
+<body class="bg-black text-on-surface font-sans antialiased min-h-screen selection:bg-primary selection:text-white">
+
+  <!-- Header Banner -->
+  <header class="border-b border-outline-variant/30 bg-surface-container-lowest/90 backdrop-blur-md sticky top-0 z-30 py-4 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary text-2xl">badge</span>
+        <div>
+          <h1 class="font-stranger-title text-xl sm:text-2xl text-primary tracking-wider uppercase">EXOUSIA 2K26</h1>
+          <p class="font-label-mono text-[11px] text-on-surface-variant uppercase tracking-widest">RESTRICTED EVENT COORDINATOR PORTAL</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-500/40 font-label-mono font-bold flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PRIVACY SAFE API
+        </span>
+        <a href="/" class="btn-terminal-secondary text-xs px-3 py-1.5 font-label-mono flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">home</span> HOME
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-8 space-y-6">
+
+    <!-- Security & Privacy Notice -->
+    <div class="p-3.5 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-between gap-3 font-label-mono text-xs text-on-surface-variant">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-base">lock_clock</span>
+        <span>Coordinators view participant metrics strictly scoped by assigned event token. Phone numbers are stripped at the backend API level.</span>
+      </div>
+      <span class="text-[10px] text-primary/80 font-bold uppercase tracking-wider hidden sm:inline-block">ZERO PII LEAKS</span>
+    </div>
+
+    <!-- Controls Row: Key Input, Event Selector & Search -->
+    <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        
+        <!-- Auth Key Input -->
+        <div class="md:col-span-4 space-y-1">
+          <label class="block font-label-mono text-[10px] text-primary uppercase tracking-widest font-bold">COORDINATOR SECRET KEY</label>
+          <input id="coord-key-input" type="password" placeholder="Enter coordinator secret key..." class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+        </div>
+
+        <!-- Event Scoped Selector -->
+        <div class="md:col-span-4 space-y-1">
+          <label class="block font-label-mono text-[10px] text-primary uppercase tracking-widest font-bold">SELECT ASSIGNED EVENT</label>
+          <select id="coord-event-select" class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer">
+            <option value="CLUE'D UP" selected>DAY 1 — CLUE'D UP</option>
+            <option value="HAWKINS TRAP">DAY 1 — HAWKINS TRAP</option>
+            <option value="DARK PROTOCOL">DAY 2 — DARK PROTOCOL</option>
+            <option value="GENOVA">DAY 2 — GENOVA</option>
+          </select>
+        </div>
+
+        <!-- Participant Search Input -->
+        <div class="md:col-span-4 space-y-1">
+          <label class="block font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">SEARCH PARTICIPANTS</label>
+          <div class="relative">
+            <input id="coord-search-input" type="text" placeholder="Type name, college, email..." class="w-full bg-surface-container border border-outline-variant/50 p-3 pl-10 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+            <span class="material-symbols-outlined text-on-surface-variant text-base absolute left-3 top-3">search</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Summary Metrics Card -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-label-mono">
+      
+      <div class="panel-terminal-glass p-5 rounded-2xl border border-primary/40 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT HEADCOUNT</span>
+          <span class="text-3xl font-bold text-primary mt-1 block" id="stat-total-count">0</span>
+          <span class="text-[11px] text-on-surface-variant/80 mt-0.5 block" id="stat-event-name">CLUE'D UP</span>
+        </div>
+        <span class="material-symbols-outlined text-primary/40 text-4xl">groups</span>
+      </div>
+
+      <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT DATE</span>
+          <span class="text-sm font-bold text-on-surface mt-1 block" id="stat-event-date">SEPTEMBER 30</span>
+          <span class="text-[11px] text-on-surface-variant/80 mt-0.5 block" id="stat-event-time">9:30 AM – 3:00 PM</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-3xl">calendar_today</span>
+      </div>
+
+      <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT VENUE</span>
+          <span class="text-sm font-bold text-on-surface mt-1 block" id="stat-event-venue">LOYALTY – 3 BLOCK</span>
+          <span class="text-[11px] text-emerald-400 font-bold mt-0.5 block">READY FOR ENTRY</span>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant/40 text-3xl">location_on</span>
+      </div>
+
+    </div>
+
+    <!-- Participant Roster Table -->
+    <div class="panel-terminal-glass p-4 sm:p-6 rounded-2xl border border-outline-variant/40 overflow-hidden space-y-4">
+      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-3">
+        <span class="font-label-mono text-xs text-primary font-bold tracking-widest uppercase flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">table_chart</span> PARTICIPANT ROSTER (<span id="table-record-count">0</span> RECORDS)
+        </span>
+        <button id="coord-refresh-btn" class="btn-terminal-secondary text-xs px-3 py-1 font-label-mono flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">refresh</span> REFRESH
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-label-mono text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase text-[10px] tracking-wider">
+              <th class="py-3 px-3">#</th>
+              <th class="py-3 px-3">REG ID</th>
+              <th class="py-3 px-3">PARTICIPANT NAME</th>
+              <th class="py-3 px-3">COLLEGE / INSTITUTE</th>
+              <th class="py-3 px-3">EMAIL ADDRESS</th>
+              <th class="py-3 px-3">DATE</th>
+              <th class="py-3 px-3">STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="coord-table-body" class="divide-y divide-outline-variant/20 text-on-surface">
+            <tr>
+              <td colspan="7" class="py-8 text-center text-on-surface-variant">Enter coordinator secret key to view records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="/src/coordinator.js"></script>
+</body>
+</html>
