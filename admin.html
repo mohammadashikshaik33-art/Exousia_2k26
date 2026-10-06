@@ -2,30 +2,31 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EXOUSIA 2026 — Organizer Admin Control</title>
-  <meta name="description" content="Official EXOUSIA Organizer Admin Control Workspace for high-concurrency participant registration inspection and management." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050709" />
+  <title>EXOUSIA 2K26 — Organizer Admin Control Desk</title>
+  <meta name="description" content="Official EXOUSIA Organizer Admin Control Workspace for registration inspection and operational management." />
   
-  <!-- Fonts -->
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Special+Elite&family=Trirong:wght@900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="/src/style.css" />
 </head>
-<body class="bg-[#0e0e0e] text-[#e3beb8] font-body text-sm min-h-screen flex flex-col antialiased selection:bg-primary/30 selection:text-primary">
+<body class="bg-[#050709] text-[#F3E7D3] font-sans antialiased min-h-screen flex flex-col selection:bg-[#E50914]/30 selection:text-[#F3E7D3]">
 
-  <!-- Admin Navigation Header -->
-  <header class="border-b border-[#5a403c]/30 bg-[#140e0f]/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3 sm:px-8">
+  <!-- Admin Header -->
+  <header class="border-b border-white/10 bg-[#080B0F]/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3 sm:px-8">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
       
       <!-- Brand & Section Label -->
       <div class="flex items-center gap-3">
-        <a href="/" class="font-stranger-title text-xl text-primary hover:text-primary-light transition-colors" title="Return to Public Festival Site">EXOUSIA</a>
-        <span class="text-xs text-outline-variant font-label-mono">//</span>
-        <span class="font-label-mono text-xs tracking-widest text-primary/80 uppercase">ORGANIZER ADMIN CONTROL</span>
+        <a href="/" class="font-headline text-xl text-[#E50914] hover:text-red-400 transition-colors tracking-wider uppercase font-bold" title="Return to Public Site">EXOUSIA 2K26</a>
+        <span class="text-xs text-[#737B85] font-mono">//</span>
+        <span class="font-mono text-xs tracking-widest text-[#F3E7D3] uppercase font-semibold">ORGANIZER ADMIN CONTROL DESK</span>
       </div>
 
       <!-- Authentication Control Bar & System Status -->
@@ -35,12 +36,12 @@
             type="password" 
             id="admin-secret-input" 
             placeholder="Enter Admin Secret Key..." 
-            class="w-full bg-[#1c1415] border border-outline-variant/40 rounded-lg px-3 py-1.5 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all pr-8"
+            class="w-full bg-[#141A21] border border-white/15 rounded-lg px-3 py-1.5 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all pr-8"
           />
           <button 
             id="toggle-secret-visibility" 
             type="button" 
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors text-xs"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-[#737B85] hover:text-[#F3E7D3] transition-colors text-xs cursor-pointer"
             title="Toggle Secret Visibility"
           >
             <span class="material-symbols-outlined text-sm">visibility</span>
@@ -50,7 +51,7 @@
         <button 
           id="admin-auth-btn" 
           type="button" 
-          class="btn-terminal-primary px-3 py-1.5 text-xs font-label-mono whitespace-nowrap flex items-center gap-1.5"
+          class="px-3.5 py-1.5 rounded-lg bg-[#E50914] hover:bg-[#E50914]/90 text-white font-mono text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
         >
           <span class="material-symbols-outlined text-sm">key</span> AUTHENTICATE
         </button>
@@ -58,13 +59,13 @@
         <button 
           id="admin-logout-btn" 
           type="button" 
-          class="btn-terminal-secondary px-3 py-1.5 text-xs font-label-mono whitespace-nowrap flex items-center gap-1.5 hidden"
+          class="px-3.5 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#F3E7D3] font-mono text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors cursor-pointer hidden"
           title="Clear session secret and lock workspace"
         >
           <span class="material-symbols-outlined text-sm">logout</span> LOGOUT
         </button>
 
-        <span id="admin-status-badge" class="font-label-mono text-[10px] px-2.5 py-1 rounded-md bg-[#251618] border border-primary/30 text-primary uppercase tracking-wider whitespace-nowrap">
+        <span id="admin-status-badge" class="font-mono text-[10px] px-2.5 py-1 rounded-md bg-[#0F141C] border border-[#E50914]/40 text-[#E50914] uppercase tracking-wider whitespace-nowrap font-bold">
           AUTH REQUIRED
         </span>
       </div>
@@ -78,84 +79,88 @@
     <!-- Section Title & Refresh Control -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
       <div>
-        <h1 class="font-stranger-title text-2xl text-primary uppercase tracking-wider">REGISTRATION CONTROL DESK</h1>
-        <p class="font-label-mono text-xs text-on-surface-variant">Manage and verify EXOUSIA participant registrations.</p>
+        <h1 class="font-headline text-2xl text-[#E50914] uppercase tracking-wider font-bold">REGISTRATION CONTROL DESK</h1>
+        <p class="font-mono text-xs text-[#A9B0B8]">Inspect, filter, and verify EXOUSIA participant registrations.</p>
       </div>
 
       <div class="flex items-center gap-2">
-        <button id="admin-refresh-btn" type="button" class="btn-terminal-secondary px-3 py-2 text-xs font-label-mono flex items-center gap-1.5" title="Refresh Database Records">
+        <button id="admin-refresh-btn" type="button" class="px-3.5 py-2 rounded-lg bg-[#0F141C] border border-white/15 hover:border-white/30 text-[#F3E7D3] font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer" title="Refresh Database Records">
           <span class="material-symbols-outlined text-sm">refresh</span> REFRESH DATA
         </button>
-        <a href="/" class="btn-terminal-secondary px-3 py-2 text-xs font-label-mono flex items-center gap-1.5">
+        <a href="/" class="px-3.5 py-2 rounded-lg bg-[#0F141C] border border-white/15 hover:border-white/30 text-[#F3E7D3] font-mono text-xs flex items-center gap-1.5 transition-colors">
           <span class="material-symbols-outlined text-sm">public</span> PUBLIC SITE
         </a>
       </div>
     </div>
 
     <!-- Operational Metrics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div class="bg-[#181012] border border-outline-variant/30 rounded-xl p-4 space-y-1">
-        <span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">TOTAL REGISTRATIONS</span>
-        <div class="font-stranger-title text-2xl text-primary" id="metric-total">0</div>
-        <div class="font-label-mono text-[10px] text-on-surface-variant">VERIFIED POSTGRES DB RECORDS</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 font-mono">
+      
+      <div class="bg-[#0F141C] border border-[#E50914]/30 rounded-xl p-4 space-y-1 shadow-lg">
+        <span class="text-[10px] text-[#A9B0B8] uppercase tracking-widest font-semibold block">TOTAL REGISTRATIONS</span>
+        <div class="text-2xl font-bold text-[#E50914]" id="metric-total">0</div>
+        <div class="text-[10px] text-[#737B85]">VERIFIED DB RECORDS</div>
       </div>
 
-      <div class="bg-[#181012] border border-outline-variant/30 rounded-xl p-4 space-y-1">
-        <span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">CLUE'D UP (DAY 1)</span>
-        <div class="font-stranger-title text-2xl text-on-surface" id="metric-cluedup">0</div>
-        <div class="font-label-mono text-[10px] text-on-surface-variant">TREASURE HUNT & DECODING</div>
+      <div class="bg-[#0F141C] border border-white/10 rounded-xl p-4 space-y-1 shadow-lg">
+        <span class="text-[10px] text-[#A9B0B8] uppercase tracking-widest font-semibold block">CLUE'D UP (DAY 1)</span>
+        <div class="text-2xl font-bold text-[#F3E7D3]" id="metric-cluedup">0</div>
+        <div class="text-[10px] text-[#737B85]">DECODING TRACK</div>
       </div>
 
-      <div class="bg-[#181012] border border-outline-variant/30 rounded-xl p-4 space-y-1">
-        <span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">HAWKINS TRAP (DAY 1)</span>
-        <div class="font-stranger-title text-2xl text-on-surface" id="metric-hawkins">0</div>
-        <div class="font-label-mono text-[10px] text-on-surface-variant">SPEED & PUZZLE TRACK</div>
+      <div class="bg-[#0F141C] border border-white/10 rounded-xl p-4 space-y-1 shadow-lg">
+        <span class="text-[10px] text-[#A9B0B8] uppercase tracking-widest font-semibold block">HAWKINS TRAP (DAY 1)</span>
+        <div class="text-2xl font-bold text-[#F3E7D3]" id="metric-hawkins">0</div>
+        <div class="text-[10px] text-[#737B85]">PUZZLE TRACK</div>
       </div>
 
-      <div class="bg-[#181012] border border-outline-variant/30 rounded-xl p-4 space-y-1">
-        <span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">DARK PORTAL (DAY 2)</span>
-        <div class="font-stranger-title text-2xl text-on-surface" id="metric-darkprotocol">0</div>
-        <div class="font-label-mono text-[10px] text-on-surface-variant">4-ROUND TEAM CHALLENGE</div>
+      <div class="bg-[#0F141C] border border-white/10 rounded-xl p-4 space-y-1 shadow-lg">
+        <span class="text-[10px] text-[#A9B0B8] uppercase tracking-widest font-semibold block">DARK PROTOCOL (DAY 2)</span>
+        <div class="text-2xl font-bold text-[#F3E7D3]" id="metric-darkprotocol">0</div>
+        <div class="text-[10px] text-[#737B85]">TEAM TRACK</div>
       </div>
 
-      <div class="bg-[#181012] border border-outline-variant/30 rounded-xl p-4 space-y-1">
-        <span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">GENOVA (DAY 2)</span>
-        <div class="font-stranger-title text-2xl text-on-surface" id="metric-genova">0</div>
-        <div class="font-label-mono text-[10px] text-on-surface-variant">SINGLE PLAYER AI CHALLENGE</div>
+      <div class="bg-[#0F141C] border border-white/10 rounded-xl p-4 space-y-1 shadow-lg">
+        <span class="text-[10px] text-[#A9B0B8] uppercase tracking-widest font-semibold block">GENOVA (DAY 2)</span>
+        <div class="text-2xl font-bold text-[#F3E7D3]" id="metric-genova">0</div>
+        <div class="text-[10px] text-[#737B85]">SOLO AI TRACK</div>
       </div>
+
     </div>
 
-    <!-- SYSTEM & REGISTRATION CONTROL PANEL -->
-    <div class="bg-[#140e0f] border border-primary/40 rounded-xl p-5 space-y-4 font-label-mono text-xs mb-6 shadow-xl">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-outline-variant/30 pb-3">
+    <!-- SYSTEM CONTROL PANEL -->
+    <div class="bg-[#0F141C] border border-[#00F0FF]/30 rounded-2xl p-5 space-y-4 font-mono text-xs shadow-xl">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-primary text-xl">tune</span>
+          <div class="w-8 h-8 rounded-lg bg-[#00F0FF]/10 border border-[#00F0FF]/25 flex items-center justify-center text-[#00F0FF]">
+            <span class="material-symbols-outlined text-xl">tune</span>
+          </div>
           <div>
-            <span class="text-on-surface font-bold uppercase tracking-wider block">SYSTEM CONTROL PANEL</span>
-            <span class="text-on-surface-variant text-[11px]">Server-side enforcement of website status, registration access, and emergency mode</span>
+            <span class="text-[#F3E7D3] font-bold uppercase tracking-wider block">SYSTEM CONTROL PANEL</span>
+            <span class="text-[#A9B0B8] text-[11px]">Server-side enforcement of website status, registration access, and emergency mode</span>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <div class="flex items-center gap-2 bg-[#1c1415] border border-outline-variant/40 px-3 py-1.5 rounded-lg">
-            <span class="text-[10px] text-on-surface-variant uppercase">WEBSITE:</span>
+          <div class="flex items-center gap-2 bg-[#141A21] border border-white/10 px-3 py-1.5 rounded-lg">
+            <span class="text-[10px] text-[#A9B0B8] uppercase">WEBSITE:</span>
             <span class="font-bold text-emerald-400" id="admin-status-website">ONLINE</span>
-            <button id="btn-toggle-website" class="btn-terminal-secondary px-2 py-0.5 text-[10px] cursor-pointer">TOGGLE</button>
+            <button id="btn-toggle-website" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F3E7D3] cursor-pointer">TOGGLE</button>
           </div>
-          <div class="flex items-center gap-2 bg-[#1c1415] border border-outline-variant/40 px-3 py-1.5 rounded-lg">
-            <span class="text-[10px] text-on-surface-variant uppercase">REGISTRATIONS:</span>
+          <div class="flex items-center gap-2 bg-[#141A21] border border-white/10 px-3 py-1.5 rounded-lg">
+            <span class="text-[10px] text-[#A9B0B8] uppercase">REGISTRATIONS:</span>
             <span class="font-bold text-emerald-400" id="admin-status-registration">OPEN</span>
-            <button id="btn-toggle-registration" class="btn-terminal-secondary px-2 py-0.5 text-[10px] cursor-pointer">TOGGLE</button>
+            <button id="btn-toggle-registration" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F3E7D3] cursor-pointer">TOGGLE</button>
           </div>
-          <div class="flex items-center gap-2 bg-[#1c1415] border border-outline-variant/40 px-3 py-1.5 rounded-lg">
-            <span class="text-[10px] text-on-surface-variant uppercase">EMERGENCY MODE:</span>
+          <div class="flex items-center gap-2 bg-[#141A21] border border-white/10 px-3 py-1.5 rounded-lg">
+            <span class="text-[10px] text-[#A9B0B8] uppercase">EMERGENCY MODE:</span>
             <span class="font-bold text-emerald-400" id="admin-status-emergency">DISABLED</span>
-            <button id="btn-toggle-emergency" class="btn-terminal-secondary px-2 py-0.5 text-[10px] cursor-pointer">TOGGLE</button>
+            <button id="btn-toggle-emergency" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F3E7D3] cursor-pointer">TOGGLE</button>
           </div>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center gap-3 pt-1">
-        <label for="admin-emergency-url" class="text-[10px] text-on-surface-variant uppercase tracking-wider flex-shrink-0 flex items-center gap-1">
+        <label for="admin-emergency-url" class="text-[10px] text-[#A9B0B8] uppercase tracking-wider flex-shrink-0 flex items-center gap-1">
           <span class="material-symbols-outlined text-amber-400 text-sm">warning</span> EMERGENCY REGISTRATION URL:
         </label>
         <div class="flex items-center gap-2 w-full">
@@ -163,58 +168,240 @@
             type="url" 
             id="admin-emergency-url" 
             placeholder="e.g. https://forms.google.com/your-backup-form" 
-            class="w-full bg-[#1c1415] border border-outline-variant/50 rounded-lg px-3 py-1.5 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+            class="w-full bg-[#141A21] border border-white/15 rounded-lg px-3 py-1.5 text-xs font-mono text-[#F3E7D3] focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] outline-none transition-all"
           />
-          <button id="btn-save-emergency-url" class="btn-terminal-primary px-3 py-1.5 text-[11px] flex-shrink-0 cursor-pointer">
+          <button id="btn-save-emergency-url" class="px-3.5 py-1.5 rounded-lg bg-[#00F0FF] hover:bg-[#00F0FF]/90 text-[#050709] font-mono text-[11px] font-bold flex-shrink-0 cursor-pointer transition-colors">
             SAVE URL
           </button>
         </div>
       </div>
     </div>
 
+    <!-- EMAIL DELIVERY & CONFIRMATION RECOVERY DESK -->
+    <div class="bg-[#0F141C] border border-emerald-500/30 rounded-2xl p-5 space-y-4 font-mono text-xs shadow-xl" id="admin-email-delivery-panel">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <span class="material-symbols-outlined text-xl">mark_email_read</span>
+          </div>
+          <div>
+            <span class="text-[#F3E7D3] font-bold uppercase tracking-wider block">EMAIL DELIVERY & SELF-HEALING SUPERVISOR</span>
+            <span class="text-[#A9B0B8] text-[11px]">Real-time queue metrics, provider circuit breakers, and bounded supervisor controls</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] text-[#A9B0B8]">
+          <span class="uppercase">LAST MANUAL RETRY:</span>
+          <span class="font-bold text-[#F3E7D3]" id="email-last-retry-time">Never</span>
+        </div>
+      </div>
+
+      <!-- Provider Circuit Breaker Status Bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+        <div class="bg-[#141A21] border border-white/10 rounded-lg px-3 py-2 flex items-center justify-between">
+          <span class="text-[#A9B0B8]">PRIMARY GMAIL:</span>
+          <span id="circuit-primary-badge" class="font-bold text-emerald-400 uppercase">HEALTHY</span>
+        </div>
+        <div class="bg-[#141A21] border border-white/10 rounded-lg px-3 py-2 flex items-center justify-between">
+          <span class="text-[#A9B0B8]">BACKUP GMAIL:</span>
+          <span id="circuit-backup-badge" class="font-bold text-amber-400 uppercase">STANDBY</span>
+        </div>
+        <div class="bg-[#141A21] border border-white/10 rounded-lg px-3 py-2 flex items-center justify-between">
+          <span class="text-[#A9B0B8]">RESEND FALLBACK:</span>
+          <span id="circuit-resend-badge" class="font-bold text-[#00F0FF] uppercase">ACTIVE (RESTRICTED)</span>
+        </div>
+      </div>
+
+      <!-- Email Delivery Metrics Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+        <div class="bg-[#141A21] border border-emerald-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-emerald-400 uppercase block font-semibold">CONFIRMATION SENT</span>
+          <span class="text-base font-bold text-emerald-400" id="email-stat-sent">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-purple-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-purple-400 uppercase block font-semibold">APOLOGY SENT</span>
+          <span class="text-base font-bold text-purple-400" id="email-stat-apology-sent">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-amber-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-amber-400 uppercase block font-semibold">PENDING / RETRYABLE</span>
+          <span class="text-base font-bold text-amber-400" id="email-stat-failed">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-red-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-red-400 uppercase block font-semibold">DEAD LETTER / REVIEW</span>
+          <span class="text-base font-bold text-red-400" id="email-stat-dead-letter">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-[#00F0FF]/30 rounded-xl p-3 space-y-1 col-span-2 sm:col-span-1">
+          <span class="text-[9px] text-[#00F0FF] uppercase block font-semibold">TOTAL REMAINING</span>
+          <span class="text-base font-bold text-[#00F0FF]" id="email-stat-remaining">0</span>
+        </div>
+      </div>
+
+      <!-- Action Row & Supervisor Control Buttons -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-white/10">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-toggle-bulk-pause" type="button" class="px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-400 hover:bg-amber-900/60 font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-sm">pause_circle</span> PAUSE BULK QUEUE
+          </button>
+          
+          <button id="btn-test-primary-sender" type="button" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#F3E7D3] font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer" title="Send single diagnostic test message via Primary Gmail">
+            <span class="material-symbols-outlined text-sm">send</span> TEST PRIMARY
+          </button>
+
+          <button id="btn-test-backup-sender" type="button" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#F3E7D3] font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer" title="Send single diagnostic test message via Backup Sender">
+            <span class="material-symbols-outlined text-sm">send</span> TEST BACKUP
+          </button>
+
+          <button id="btn-recover-stuck-queue" type="button" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#00F0FF] font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer" title="Safely restore stale sending items (>10m) back to pending">
+            <span class="material-symbols-outlined text-sm">build</span> RECOVER STUCK QUEUE
+          </button>
+        </div>
+        
+        <button id="btn-resend-remaining-confirmations" type="button" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+          <span class="material-symbols-outlined text-sm">mark_email_unread</span> RESEND REMAINING CONFIRMATIONS
+        </button>
+      </div>
+
+      <!-- Execution Summary Display Box -->
+      <div id="email-recovery-log-box" class="hidden p-3 rounded-xl bg-[#050709] border border-emerald-500/30 text-[11px] font-mono text-[#F3E7D3] space-y-1">
+        <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">check_circle</span> <span id="recovery-log-title">Recovery Execution Completed</span>
+        </div>
+        <div id="recovery-log-details" class="text-[#A9B0B8]"></div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK WORKFLOW CONTROL PANEL -->
+    <div class="bg-[#0F141C] border border-[#E50914]/30 rounded-2xl p-5 space-y-4 font-mono text-xs shadow-xl" id="admin-feedback-workflow-panel">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-[#E50914]/10 border border-[#E50914]/30 flex items-center justify-center text-[#E50914]">
+            <span class="material-symbols-outlined text-xl">rate_review</span>
+          </div>
+          <div>
+            <span class="text-[#F3E7D3] font-bold uppercase tracking-wider block">FEEDBACK WORKFLOW CONTROL DESK</span>
+            <span class="text-[#A9B0B8] text-[11px]">Manual and scheduled feedback dispatch, idempotency tracking, and retry controls</span>
+          </div>
+        </div>
+
+        <!-- Day Switcher Buttons -->
+        <div class="flex items-center gap-2 bg-[#141A21] p-1 rounded-xl border border-white/10">
+          <button id="admin-fb-day1-tab" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-[#E50914] text-white">
+            DAY 1 (SEPT 30)
+          </button>
+          <button id="admin-fb-day2-tab" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-[#A9B0B8] hover:text-[#F3E7D3]">
+            DAY 2 (OCT 01)
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback Metrics Grid for Active Day -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#A9B0B8] uppercase block font-semibold">ELIGIBLE PARTICIPANTS</span>
+          <span class="text-base font-bold text-[#F3E7D3]" id="fb-metric-eligible">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-emerald-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-emerald-400 uppercase block font-semibold">EMAILS SENT</span>
+          <span class="text-base font-bold text-emerald-400" id="fb-metric-sent">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-red-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-red-400 uppercase block font-semibold">DELIVERY FAILED</span>
+          <span class="text-base font-bold text-red-400" id="fb-metric-failed">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-amber-500/30 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-amber-400 uppercase block font-semibold">PENDING / SKIPPED</span>
+          <span class="text-base font-bold text-amber-400" id="fb-metric-pending">0</span>
+        </div>
+        <div class="bg-[#141A21] border border-[#00F0FF]/30 rounded-xl p-3 space-y-1 col-span-2 sm:col-span-1">
+          <span class="text-[9px] text-[#00F0FF] uppercase block font-semibold">SCHEDULE STATUS</span>
+          <span class="text-[10px] font-bold text-[#00F0FF] block truncate" id="fb-metric-schedule">NOT SCHEDULED</span>
+        </div>
+      </div>
+
+      <!-- Action Controls & Time Picker Row -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-white/10">
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-fb-send-now" type="button" class="px-3.5 py-2 rounded-lg bg-[#E50914] hover:bg-[#E50914]/90 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-md">
+            <span class="material-symbols-outlined text-sm">send</span> SEND FEEDBACK NOW
+          </button>
+          
+          <button id="btn-fb-retry-failed" type="button" class="px-3.5 py-2 rounded-lg bg-amber-600/20 border border-amber-500/40 text-amber-400 hover:bg-amber-600/30 font-mono text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+            <span class="material-symbols-outlined text-sm">replay</span> RETRY FAILED
+          </button>
+
+          <button id="btn-fb-cancel-schedule" type="button" class="px-3.5 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-400 hover:bg-red-900/60 font-mono text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer hidden">
+            <span class="material-symbols-outlined text-sm">cancel</span> CANCEL SCHEDULE
+          </button>
+        </div>
+
+        <!-- Schedule Date/Time Input Group -->
+        <div class="flex items-center gap-2 bg-[#141A21] border border-white/10 p-1.5 rounded-xl">
+          <label for="fb-schedule-datetime" class="text-[10px] text-[#A9B0B8] uppercase tracking-wider flex items-center gap-1 px-1 whitespace-nowrap">
+            <span class="material-symbols-outlined text-[#00F0FF] text-sm">schedule</span> SCHEDULE (IST):
+          </label>
+          <input 
+            type="datetime-local" 
+            id="fb-schedule-datetime" 
+            class="bg-[#050709] border border-white/15 rounded-lg px-2.5 py-1 text-xs font-mono text-[#F3E7D3] focus:border-[#00F0FF] outline-none transition-all cursor-pointer"
+          />
+          <button id="btn-fb-save-schedule" type="button" class="px-3 py-1 rounded-lg bg-[#00F0FF] hover:bg-[#00F0FF]/90 text-[#050709] font-mono text-[11px] font-bold cursor-pointer transition-colors whitespace-nowrap">
+            SAVE SCHEDULE
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Control Toolbar (Search, Filter, Sort, Page Size) -->
-    <div class="bg-[#140e0f] border border-outline-variant/40 rounded-xl p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+    <div class="bg-[#0F141C] border border-white/10 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-12 gap-3 items-center shadow-lg font-mono">
       
       <!-- Search Input -->
       <div class="md:col-span-5 relative">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">search</span>
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#737B85] text-base">search</span>
         <input 
           type="text" 
           id="admin-search-input" 
-          placeholder="Search ID, Name, Email, Phone, College..." 
-          class="w-full bg-[#1c1415] border border-outline-variant/50 rounded-lg pl-9 pr-3 py-2 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+          placeholder="Search Reg ID, Name, Email, Phone, College..." 
+          class="w-full bg-[#141A21] border border-white/15 rounded-xl pl-9 pr-3 py-2 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all"
         />
       </div>
 
       <!-- Event Filter Dropdown -->
       <div class="md:col-span-3">
-        <select id="admin-event-filter" class="w-full bg-[#1c1415] border border-outline-variant/50 rounded-lg px-3 py-2 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+        <select id="admin-event-filter" class="w-full bg-[#141A21] border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all cursor-pointer">
           <option value="ALL">ALL EVENT TRACKS</option>
           <option value="CLUE'D UP">CLUE'D UP (DAY 1)</option>
           <option value="HAWKINS TRAP">HAWKINS TRAP (DAY 1)</option>
-          <option value="DARK PORTAL">DARK PORTAL (DAY 2)</option>
+          <option value="DARK PROTOCOL">DARK PROTOCOL (DAY 2)</option>
           <option value="GENOVA">GENOVA (DAY 2)</option>
         </select>
       </div>
 
       <!-- Status Filter Dropdown -->
       <div class="md:col-span-2">
-        <select id="admin-status-filter" class="w-full bg-[#1c1415] border border-outline-variant/50 rounded-lg px-3 py-2 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-          <option value="ALL">ALL STATUSES</option>
-          <option value="REGISTERED">REGISTERED</option>
+        <select id="admin-status-filter" class="w-full bg-[#141A21] border border-white/15 rounded-xl px-3 py-2 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all cursor-pointer">
+          <option value="ALL">ALL EMAIL STATUSES</option>
+          <option value="CONFIRMATION SENT">CONFIRMATION SENT</option>
+          <option value="CONFIRMATION QUEUED">CONFIRMATION QUEUED</option>
+          <option value="RETRYING">RETRYING</option>
+          <option value="FAILED">FAILED</option>
+          <option value="APOLOGY QUEUED">APOLOGY QUEUED</option>
+          <option value="APOLOGY SENT">APOLOGY SENT</option>
+          <option value="PERMANENT FAILURE">PERMANENT FAILURE</option>
         </select>
       </div>
 
       <!-- Sort & Page Size Controls -->
       <div class="md:col-span-2 flex items-center gap-2">
-        <select id="admin-sort-filter" class="w-full bg-[#1c1415] border border-outline-variant/50 rounded-lg px-2 py-2 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" title="Sort Order">
-          <option value="newest">NEWEST FIRST</option>
-          <option value="oldest">OLDEST FIRST</option>
+        <select id="admin-sort-filter" class="w-full bg-[#141A21] border border-white/15 rounded-xl px-2.5 py-2 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all cursor-pointer" title="Sort Order">
+          <option value="newest">NEWEST</option>
+          <option value="oldest">OLDEST</option>
           <option value="name_asc">NAME (A-Z)</option>
           <option value="name_desc">NAME (Z-A)</option>
         </select>
 
-        <select id="admin-pagesize-filter" class="bg-[#1c1415] border border-outline-variant/50 rounded-lg px-2 py-2 text-xs font-label-mono text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" title="Rows Per Page">
+        <select id="admin-pagesize-filter" class="bg-[#141A21] border border-white/15 rounded-xl px-2 py-2 text-xs font-mono text-[#F3E7D3] focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all cursor-pointer" title="Rows Per Page">
           <option value="25">25/P</option>
           <option value="50">50/P</option>
           <option value="100">100/P</option>
@@ -224,77 +411,78 @@
     </div>
 
     <!-- Data Table Container -->
-    <div class="bg-[#140e0f] border border-outline-variant/40 rounded-xl overflow-hidden relative shadow-2xl">
+    <div class="bg-[#0F141C] border border-white/10 rounded-2xl overflow-hidden relative shadow-2xl">
       <div class="overflow-x-auto min-h-[320px]">
-        <table class="w-full text-left font-label-mono border-collapse">
+        <table class="w-full text-left font-mono border-collapse text-xs">
           <thead>
-            <tr class="bg-[#1c1415] border-b border-outline-variant/40 text-[10px] text-on-surface-variant uppercase tracking-widest">
-              <th class="py-3 px-4">REGISTRATION ID</th>
-              <th class="py-3 px-4">PARTICIPANT NAME</th>
-              <th class="py-3 px-4">COLLEGE / INSTITUTION</th>
-              <th class="py-3 px-4">SELECTED EVENT TRACK</th>
-              <th class="py-3 px-4">STATUS</th>
-              <th class="py-3 px-4">CREATED AT</th>
-              <th class="py-3 px-4 text-right">ACTIONS</th>
+            <tr class="bg-[#141A21] border-b border-white/10 text-[10px] text-[#737B85] uppercase tracking-widest font-bold">
+              <th class="py-3.5 px-4">REGISTRATION ID</th>
+              <th class="py-3.5 px-4">PARTICIPANT NAME</th>
+              <th class="py-3.5 px-4">COLLEGE / INSTITUTION</th>
+              <th class="py-3.5 px-4">SELECTED TRACK</th>
+              <th class="py-3.5 px-4">CONFIRMATION EMAIL</th>
+              <th class="py-3.5 px-4">APOLOGY EMAIL</th>
+              <th class="py-3.5 px-4">CREATED AT</th>
+              <th class="py-3.5 px-4 text-right">ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="admin-table-body" class="divide-y divide-outline-variant/20 text-xs">
+          <tbody id="admin-table-body" class="divide-y divide-white/5 text-[#F3E7D3]">
             <!-- Dynamic rows populated via JS -->
           </tbody>
         </table>
       </div>
 
-      <!-- State Overlay 1: Loading State -->
-      <div id="admin-state-loading" class="hidden absolute inset-0 bg-[#0e0e0e]/85 backdrop-blur-sm flex flex-col justify-center items-center gap-3 z-20">
-        <span class="material-symbols-outlined text-primary text-3xl animate-spin">sync</span>
-        <span class="font-label-mono text-xs text-primary uppercase tracking-widest">QUERYING SUPABASE REGISTRATION RECORDS...</span>
+      <!-- Overlay 1: Loading State -->
+      <div id="admin-state-loading" class="hidden absolute inset-0 bg-[#050709]/90 backdrop-blur-sm flex flex-col justify-center items-center gap-3 z-20">
+        <span class="material-symbols-outlined text-[#E50914] text-3xl animate-spin">sync</span>
+        <span class="font-mono text-xs text-[#E50914] uppercase tracking-widest font-semibold">QUERYING SUPABASE REGISTRATION RECORDS...</span>
       </div>
 
-      <!-- State Overlay 2: Empty Database (0 records) -->
+      <!-- Overlay 2: Empty Database (0 records) -->
       <div id="admin-state-empty" class="hidden p-12 text-center space-y-2">
-        <span class="material-symbols-outlined text-on-surface-variant text-4xl">folder_off</span>
-        <h3 class="font-stranger-title text-lg text-primary uppercase tracking-wider">NO REGISTRATIONS YET</h3>
-        <p class="font-label-mono text-xs text-on-surface-variant max-w-md mx-auto">Registered participants will appear here after successful registration.</p>
+        <span class="material-symbols-outlined text-[#737B85] text-4xl">folder_off</span>
+        <h3 class="font-mono font-bold text-base text-[#E50914] uppercase tracking-wider">NO REGISTRATIONS YET</h3>
+        <p class="font-mono text-xs text-[#A9B0B8] max-w-md mx-auto">Registered participants will appear here after successful registration.</p>
       </div>
 
-      <!-- State Overlay 3: Empty Search (No matches) -->
+      <!-- Overlay 3: Empty Search (No matches) -->
       <div id="admin-state-search-empty" class="hidden p-12 text-center space-y-2">
-        <span class="material-symbols-outlined text-on-surface-variant text-4xl">search_off</span>
-        <h3 class="font-stranger-title text-lg text-primary uppercase tracking-wider">NO MATCHING REGISTRATIONS FOUND</h3>
-        <p class="font-label-mono text-xs text-on-surface-variant max-w-md mx-auto" id="search-empty-msg">No participant records match the specified search parameters or active filters.</p>
+        <span class="material-symbols-outlined text-[#737B85] text-4xl">search_off</span>
+        <h3 class="font-mono font-bold text-base text-[#E50914] uppercase tracking-wider">NO MATCHING REGISTRATIONS FOUND</h3>
+        <p class="font-mono text-xs text-[#A9B0B8] max-w-md mx-auto" id="search-empty-msg">No participant records match the specified search parameters or active filters.</p>
       </div>
 
-      <!-- State Overlay 4: Unauthorized (401) -->
+      <!-- Overlay 4: Unauthorized (401) -->
       <div id="admin-state-unauthorized" class="hidden p-12 text-center space-y-3">
-        <span class="material-symbols-outlined text-primary text-4xl">lock</span>
-        <h3 class="font-stranger-title text-xl text-primary uppercase tracking-wider">UNAUTHORIZED ACCESS — ADMIN SECRET REQUIRED</h3>
-        <p class="font-label-mono text-xs text-on-surface-variant max-w-lg mx-auto">
+        <span class="material-symbols-outlined text-[#E50914] text-4xl">lock</span>
+        <h3 class="font-mono font-bold text-base text-[#E50914] uppercase tracking-wider">UNAUTHORIZED ACCESS — ADMIN SECRET REQUIRED</h3>
+        <p class="font-mono text-xs text-[#A9B0B8] max-w-lg mx-auto">
           Participant registration records are protected by server-side authorization. Please enter your authorized Admin Secret Key in the header control bar above to unlock operational data inspection.
         </p>
       </div>
 
-      <!-- State Overlay 5: Database Service Unavailable (503 / 500) -->
+      <!-- Overlay 5: Database Error (503 / 500) -->
       <div id="admin-state-error" class="hidden p-12 text-center space-y-3">
         <span class="material-symbols-outlined text-red-400 text-4xl">cloud_off</span>
-        <h3 class="font-stranger-title text-xl text-red-400 uppercase tracking-wider">REGISTRATION DATA UNAVAILABLE</h3>
-        <p class="font-label-mono text-xs text-on-surface-variant max-w-lg mx-auto" id="admin-error-msg">
-          Unable to connect to registration database service. Verify environment variable configuration (<code class="text-primary">SUPABASE_URL</code> and <code class="text-primary">SUPABASE_SERVICE_ROLE_KEY</code>) on Vercel backend.
+        <h3 class="font-mono font-bold text-base text-red-400 uppercase tracking-wider">REGISTRATION DATA UNAVAILABLE</h3>
+        <p class="font-mono text-xs text-[#A9B0B8] max-w-lg mx-auto" id="admin-error-msg">
+          Unable to connect to registration database service. Verify environment variable configuration on Vercel backend.
         </p>
       </div>
 
     </div>
 
     <!-- Pagination Footer -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#140e0f] border border-outline-variant/40 rounded-xl p-4 font-label-mono text-xs">
-      <div id="admin-pagination-info" class="text-on-surface-variant">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#0F141C] border border-white/10 rounded-2xl p-4 font-mono text-xs shadow-lg">
+      <div id="admin-pagination-info" class="text-[#A9B0B8]">
         Showing 0–0 of 0 registrations (Page 0 of 0)
       </div>
 
       <div class="flex items-center gap-2">
-        <button id="admin-prev-btn" type="button" class="btn-terminal-secondary px-3 py-1.5 text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+        <button id="admin-prev-btn" type="button" class="px-3.5 py-1.5 rounded-lg bg-[#141A21] border border-white/15 text-[#F3E7D3] hover:text-white text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors">
           <span class="material-symbols-outlined text-sm">arrow_back</span> PREVIOUS
         </button>
-        <button id="admin-next-btn" type="button" class="btn-terminal-secondary px-3 py-1.5 text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed">
+        <button id="admin-next-btn" type="button" class="px-3.5 py-1.5 rounded-lg bg-[#141A21] border border-white/15 text-[#F3E7D3] hover:text-white text-xs flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors">
           NEXT <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
       </div>
@@ -303,70 +491,84 @@
   </main>
 
   <!-- Participant Detail Inspection Modal -->
-  <div id="participant-detail-modal" class="modal-backdrop">
-    <div class="panel-modal-glass max-w-lg w-full p-6 space-y-6">
+  <div id="participant-detail-modal" class="fixed inset-0 z-50 bg-[#050709]/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0F141C] border border-white/15 max-w-lg w-full rounded-2xl p-6 space-y-6 shadow-2xl">
       
       <!-- Modal Header -->
-      <div class="flex justify-between items-start border-b border-primary/20 pb-4">
+      <div class="flex justify-between items-start border-b border-white/10 pb-4">
         <div>
-          <span class="pass-header-badge">PARTICIPANT RECORD INSPECTION</span>
-          <h3 class="font-stranger-title text-xl text-primary mt-2 select-text" id="detail-full-name">PARTICIPANT RECORD</h3>
-          <p class="font-label-mono text-xs text-on-surface-variant select-text" id="detail-college">INSTITUTION PENDING</p>
+          <span class="text-[10px] font-mono font-bold text-[#E50914] uppercase tracking-widest block">PARTICIPANT RECORD INSPECTION</span>
+          <h3 class="font-headline text-xl text-[#F3E7D3] mt-1 select-text font-bold" id="detail-full-name">PARTICIPANT RECORD</h3>
+          <p class="font-mono text-xs text-[#A9B0B8] select-text" id="detail-college">INSTITUTION PENDING</p>
         </div>
-        <button id="detail-modal-close" type="button" class="text-on-surface-variant hover:text-primary transition-colors p-1" title="Close Inspection Window">
+        <button id="detail-modal-close" type="button" class="text-[#737B85] hover:text-[#F3E7D3] transition-colors p-1 cursor-pointer" title="Close Inspection Window">
           <span class="material-symbols-outlined text-xl">close</span>
         </button>
       </div>
 
       <!-- Detail Parameter Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-label-mono text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
         
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">REGISTRATION ID</span>
-          <span class="text-primary font-bold tracking-wider select-text" id="detail-reg-id">EX-2026-XXXXXX</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">REGISTRATION ID</span>
+          <span class="text-[#00F0FF] font-bold tracking-wider select-text" id="detail-reg-id">EX-2026-XXXXXX</span>
         </div>
 
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">STATUS</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">STATUS</span>
           <span class="text-emerald-400 font-bold tracking-wider" id="detail-status">REGISTERED</span>
         </div>
 
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">EMAIL ADDRESS</span>
-          <span class="text-on-surface select-text truncate block" id="detail-email">participant@institution.edu</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">EMAIL ADDRESS</span>
+          <span class="text-[#F3E7D3] select-text truncate block" id="detail-email">participant@institution.edu</span>
         </div>
 
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">PHONE NUMBER</span>
-          <span class="text-on-surface select-text truncate block" id="detail-phone">+0 000 000-0000</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">PHONE NUMBER</span>
+          <span class="text-[#F3E7D3] select-text truncate block" id="detail-phone">+0 000 000-0000</span>
         </div>
 
-        <div class="sm:col-span-2 bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">SELECTED EVENT TRACK</span>
-          <span class="text-on-surface font-semibold select-text" id="detail-event">AI SYMPOSIUM (DAY 1)</span>
+        <div class="sm:col-span-2 bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">SELECTED EVENT TRACK</span>
+          <span class="text-[#F3E7D3] font-semibold select-text" id="detail-event">CLUE'D UP</span>
         </div>
 
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">CREATED AT</span>
-          <span class="text-on-surface-variant text-[11px] select-text" id="detail-created">2026-09-17 12:00:00</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">CREATED AT</span>
+          <span class="text-[#A9B0B8] text-[11px] select-text" id="detail-created">2026-09-17 12:00:00</span>
         </div>
 
-        <div class="bg-[#181012] border border-outline-variant/30 rounded-lg p-3 space-y-1">
-          <span class="text-[9px] text-on-surface-variant uppercase block">UPDATED AT</span>
-          <span class="text-on-surface-variant text-[11px] select-text" id="detail-updated">2026-09-17 12:00:00</span>
+        <div class="bg-[#141A21] border border-white/10 rounded-xl p-3 space-y-1">
+          <span class="text-[9px] text-[#737B85] uppercase block font-semibold">UPDATED AT</span>
+          <span class="text-[#A9B0B8] text-[11px] select-text" id="detail-updated">2026-09-17 12:00:00</span>
         </div>
 
       </div>
 
       <!-- QR Verification Token Code Box -->
-      <div class="bg-[#1c1415] border border-primary/30 rounded-lg p-3 space-y-1 font-label-mono text-xs">
-        <span class="text-[9px] text-primary/70 uppercase block">CANONICAL QR VERIFICATION TOKEN PAYLOAD</span>
-        <code class="text-primary font-bold tracking-wider select-text block" id="detail-qr-payload">EXOUSIA:EX-2026-XXXXXX</code>
+      <div class="bg-[#141A21] border border-[#E50914]/30 rounded-xl p-3 space-y-1 font-mono text-xs">
+        <span class="text-[9px] text-[#E50914] uppercase block font-bold">CANONICAL QR VERIFICATION TOKEN PAYLOAD</span>
+        <code class="text-[#E50914] font-bold tracking-wider select-text block" id="detail-qr-payload">EXOUSIA:EX-2026-XXXXXX</code>
+      </div>
+
+      <!-- Email Delivery Event Timeline -->
+      <div class="bg-[#141A21] border border-emerald-500/30 rounded-xl p-4 space-y-3 font-mono text-xs">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
+          <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">history</span> EMAIL DELIVERY TIMELINE & AUDIT LOG
+          </span>
+          <span class="text-[9px] text-[#A9B0B8]" id="detail-attempts-count">0 ATTEMPTS</span>
+        </div>
+
+        <div class="space-y-2 text-[11px]" id="detail-email-timeline">
+          <!-- Timeline steps rendered via JS -->
+        </div>
       </div>
 
       <!-- Modal Actions -->
       <div class="flex justify-end gap-3 pt-2">
-        <button id="detail-view-pass-btn" type="button" class="btn-terminal-primary py-2.5 px-4 font-label-mono text-xs flex items-center gap-2">
+        <button id="detail-view-pass-btn" type="button" class="px-4 py-2 rounded-lg bg-[#E50914] hover:bg-[#E50914]/90 text-white font-mono text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer">
           <span class="material-symbols-outlined text-base">badge</span> VIEW PARTICIPANT PASS
         </button>
       </div>
@@ -374,53 +576,87 @@
     </div>
   </div>
 
-  <!-- Digital Pass Preview Modal (Reuses Phase 6 Visual Pass Component) -->
-  <div id="admin-pass-preview-modal" class="modal-backdrop">
-    <div class="panel-modal-glass max-w-lg w-full p-6 space-y-6">
+  <!-- Digital Pass Preview Modal -->
+  <div id="admin-pass-preview-modal" class="fixed inset-0 z-50 bg-[#050709]/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0F141C] border border-white/15 max-w-lg w-full rounded-2xl p-6 space-y-6 shadow-2xl">
       
-      <div class="flex justify-between items-center border-b border-primary/20 pb-3">
-        <span class="pass-header-badge">DIGITAL PASS PREVIEW</span>
-        <button id="admin-pass-close-btn" type="button" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3 font-mono">
+        <span class="text-[10px] font-bold text-[#E50914] uppercase tracking-widest">DIGITAL PASS PREVIEW</span>
+        <button id="admin-pass-close-btn" type="button" class="text-[#737B85] hover:text-[#F3E7D3] transition-colors p-1 cursor-pointer">
           <span class="material-symbols-outlined text-xl">close</span>
         </button>
       </div>
 
-      <div class="holographic-pass-card" id="admin-digital-pass-card">
-        <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 mb-4">
+      <div class="bg-[#050709] border border-[#E50914]/40 rounded-xl p-4 shadow-xl" id="admin-digital-pass-card">
+        <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 mb-4 font-mono">
           <div class="space-y-1 text-center sm:text-left">
-            <span class="pass-header-badge">EXOUSIA 2026 // PARTICIPANT CREDENTIAL</span>
-            <h4 class="font-stranger-title text-xl sm:text-2xl text-primary mt-2 uppercase tracking-wide" id="admin-pass-display-name">PARTICIPANT CREDENTIAL</h4>
-            <p class="font-label-mono text-xs text-on-surface-variant" id="admin-pass-display-college">INSTITUTION PENDING</p>
+            <span class="text-[9px] text-[#E50914] font-bold uppercase tracking-widest block">EXOUSIA 2K26 // PARTICIPANT CREDENTIAL</span>
+            <h4 class="font-headline text-xl text-[#F3E7D3] mt-1 uppercase tracking-wide font-bold" id="admin-pass-display-name">PARTICIPANT CREDENTIAL</h4>
+            <p class="text-xs text-[#A9B0B8]" id="admin-pass-display-college">INSTITUTION PENDING</p>
           </div>
           <div class="flex flex-col items-center">
-            <div class="w-32 h-32 bg-surface-container border border-primary/40 rounded-lg p-2 flex items-center justify-center shadow-lg">
-              <canvas id="admin-pass-qr-canvas" width="112" height="112" class="w-full h-full" role="img" aria-label="Registration verification code"></canvas>
+            <div class="w-28 h-28 bg-white p-2 rounded-lg flex items-center justify-center shadow-lg">
+              <canvas id="admin-pass-qr-canvas" width="100" height="100" class="w-full h-full" role="img" aria-label="Registration verification code"></canvas>
             </div>
-            <span class="font-label-mono text-[9px] text-primary/70 mt-1 uppercase tracking-widest">QR VERIFICATION TOKEN</span>
+            <span class="text-[9px] text-[#A9B0B8] mt-1 uppercase tracking-widest">VERIFICATION QR</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-b border-primary/20 py-3 my-4 font-label-mono text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-b border-white/10 py-3 my-4 font-mono text-xs">
           <div>
-            <span class="text-on-surface-variant text-[9px] block uppercase">REGISTRATION ID</span>
-            <span class="text-primary font-bold text-sm tracking-wider select-text" id="admin-pass-display-id">EX-2026-XXXXXX</span>
+            <span class="text-[#737B85] text-[9px] block uppercase font-semibold">REGISTRATION ID</span>
+            <span class="text-[#00F0FF] font-bold text-sm tracking-wider select-text" id="admin-pass-display-id">EX-2026-XXXXXX</span>
           </div>
           <div>
-            <span class="text-on-surface-variant text-[9px] block uppercase">SELECTED TRACK</span>
-            <span class="text-on-surface truncate block" id="admin-pass-display-track">AI SYMPOSIUM</span>
+            <span class="text-[#737B85] text-[9px] block uppercase font-semibold">SELECTED TRACK</span>
+            <span class="text-[#F3E7D3] truncate block" id="admin-pass-display-track">CLUE'D UP</span>
           </div>
           <div>
-            <span class="text-on-surface-variant text-[9px] block uppercase">STATUS</span>
+            <span class="text-[#737B85] text-[9px] block uppercase font-semibold">STATUS</span>
             <span class="text-emerald-400 font-bold tracking-wider" id="admin-pass-display-status">REGISTERED</span>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between items-center font-label-mono text-[9px] text-primary/70 uppercase tracking-widest gap-1">
-          <span>SECTOR 7G CLEARANCE: GRANTED</span>
+        <div class="flex flex-col sm:flex-row justify-between items-center font-mono text-[9px] text-[#737B85] uppercase tracking-widest gap-1">
+          <span>ENTRY AUTHORIZED</span>
           <span id="admin-pass-display-date">ISSUED: SEPT 2026</span>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Send Now Feedback Confirmation Modal -->
+  <div id="fb-send-now-modal" class="fixed inset-0 z-50 bg-[#050709]/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-[#0F141C] border border-[#E50914]/40 max-w-md w-full rounded-2xl p-6 space-y-5 shadow-2xl font-mono">
+      <div class="flex justify-between items-center border-b border-white/10 pb-3">
+        <span class="text-xs font-bold text-[#E50914] uppercase tracking-wider flex items-center gap-1">
+          <span class="material-symbols-outlined text-base">warning</span> CONFIRM FEEDBACK DISPATCH
+        </span>
+        <button id="fb-modal-close-btn" type="button" class="text-[#737B85] hover:text-[#F3E7D3] transition-colors p-1 cursor-pointer">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-[#F3E7D3]">
+        <p>Are you sure you want to send <strong class="text-[#E50914]" id="modal-fb-day-title">DAY 1</strong> feedback emails NOW to all eligible confirmed participants?</p>
+        
+        <div id="modal-fb-conflict-warning" class="bg-amber-950/40 border border-amber-500/40 p-3 rounded-xl text-amber-300 space-y-1 hidden">
+          <span class="font-bold flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> SCHEDULED CAMPAIGN CONFLICT</span>
+          <p class="text-[11px]">A delivery schedule is currently active for this day. Triggering <strong>SEND NOW</strong> will execute immediate dispatch and cancel the scheduled timer.</p>
+        </div>
+
+        <p class="text-[11px] text-[#A9B0B8]">Server-side idempotency will ensure participants who previously received this feedback email are safely skipped.</p>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="fb-modal-cancel-btn" type="button" class="px-4 py-2 rounded-lg bg-[#141A21] border border-white/15 text-[#F3E7D3] hover:text-white text-xs font-semibold cursor-pointer">
+          CANCEL
+        </button>
+        <button id="fb-modal-confirm-send-btn" type="button" class="px-4 py-2 rounded-lg bg-[#E50914] hover:bg-[#E50914]/90 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">send</span> YES, DISPATCH NOW
+        </button>
+      </div>
     </div>
   </div>
 

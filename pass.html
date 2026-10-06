@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050709" />
+  <title>EXOUSIA 2K26 — Official Anomaly File Credential</title>
+  <meta name="description" content="Official EXOUSIA 2K26 Technical Registration Credential & Classified Anomaly File Dossier." />
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Share+Tech+Mono&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="/src/style.css" />
+
+  <style>
+    /* Print Optimization Stylesheet */
+    @media print {
+      body {
+        background: #050709 !important;
+        color: #F0F0F5 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .anomaly-dossier-canvas {
+        box-shadow: none !important;
+        border: 1px solid rgba(229, 9, 20, 0.4) !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#050709] text-[#F0F0F5] font-sans antialiased min-h-screen flex flex-col selection:bg-[#E50914]/30 selection:text-[#F0F0F5]">
+
+  <!-- Top Action Navigation Bar -->
+  <header class="no-print border-b border-white/10 bg-[#080B0F]/90 backdrop-blur-md sticky top-0 z-50 py-3.5 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+      
+      <!-- Brand Tag -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="font-headline text-lg sm:text-xl text-[#E50914] tracking-wider uppercase font-bold hover:text-red-400 transition-colors">
+          EXOUSIA 2K26
+        </a>
+        <span class="text-xs text-[#8D929A] font-mono">//</span>
+        <span class="font-mono text-xs text-[#F0F0F5] uppercase tracking-widest font-semibold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#E50914] animate-pulse"></span> ANOMALY FILE DOSSIER
+        </span>
+        <span id="dossier-offline-badge" class="hidden px-2.5 py-1 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-400 font-mono text-[10px] font-bold flex items-center gap-1">
+          ⚡ OFFLINE MODE
+        </span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5 flex-wrap justify-center sm:justify-end">
+        <button id="btn-install-pwa" type="button" class="hidden px-3.5 py-1.5 rounded-lg bg-[#E50914]/15 border border-[#E50914]/40 hover:bg-[#E50914]/30 text-[#F0F0F5] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">download</span> INSTALL ANOMALY FILE
+        </button>
+
+        <button id="btn-copy-link" type="button" class="px-3.5 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-[#E50914]/50 text-[#F0F0F5] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">link</span> COPY DOSSIER LINK
+        </button>
+
+        <button id="btn-print-pass" type="button" class="px-3.5 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#F0F0F5] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">print</span> PRINT / SAVE DOSSIER
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Viewport Area -->
+  <main class="flex-1 w-full max-w-7xl mx-auto py-6 sm:py-10 px-4 sm:px-6 flex flex-col items-center justify-center">
+
+    <!-- Loading State -->
+    <div id="pass-state-loading" class="py-16 text-center space-y-4">
+      <div class="w-12 h-12 rounded-full bg-[#E50914]/10 border border-[#E50914]/30 flex items-center justify-center mx-auto text-[#E50914] animate-spin">
+        <span class="material-symbols-outlined text-2xl">sync</span>
+      </div>
+      <div class="font-mono text-xs text-[#E50914] uppercase tracking-widest font-bold animate-pulse">
+        RETRIEVING ANOMALY TELEMETRY...
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="pass-state-error" class="hidden py-16 text-center space-y-4 max-w-md mx-auto">
+      <div class="w-14 h-14 rounded-2xl bg-red-950/60 border border-red-500/40 flex items-center justify-center mx-auto text-red-400">
+        <span class="material-symbols-outlined text-3xl">warning</span>
+      </div>
+      <h2 class="font-mono text-sm font-bold text-white uppercase tracking-wider">ANOMALY RECORD NOT FOUND</h2>
+      <p class="font-mono text-xs text-[#8D929A] leading-relaxed" id="pass-error-msg">
+        The requested registration ID could not be loaded from the EXOUSIA system database.
+      </p>
+      <div class="pt-2">
+        <a href="/" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#141A21] border border-white/15 font-mono text-xs text-white hover:border-[#E50914]">
+          <span class="material-symbols-outlined text-sm">home</span> RETURN TO HOME
+        </a>
+      </div>
+    </div>
+
+    <!-- Interactive Master Anomaly File Dossier Canvas Container -->
+    <div id="pass-dossier-wrapper" class="hidden w-full flex flex-col items-center justify-center space-y-4">
+
+      <!-- Master Anomaly File Dossier (1.6 : 1 Master Ratio Desktop / Controlled Mobile Dossier) -->
+      <article id="anomaly-dossier-card" class="anomaly-dossier-canvas relative w-full max-w-[1280px] bg-[#050709] border border-[#E50914]/35 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(229,9,20,0.18)] transition-all duration-300">
+        
+        <!-- Procedural Atmospheric SVG Background Layer -->
+        <div id="dossier-svg-bg" class="absolute inset-0 pointer-events-none z-0"></div>
+
+        <!-- Scanning Line Overlay (Atmospheric Motion) -->
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#E50914]/[0.03] to-transparent pointer-events-none z-0 animate-scanline"></div>
+
+        <!-- Safe Container (60px Desktop Safe Margin Grid) -->
+        <div class="relative z-10 p-5 sm:p-10 md:p-14 flex flex-col justify-between min-h-[640px] md:min-h-[720px] lg:min-h-[800px] space-y-6 md:space-y-8">
+
+          <!-- TOP HEADER ZONE -->
+          <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-5">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#E50914] shadow-[0_0_10px_#E50914]"></span>
+                <h1 class="font-headline text-2xl sm:text-3xl md:text-4xl text-[#E50914] font-extrabold tracking-wider uppercase">
+                  EXOUSIA 2K26
+                </h1>
+              </div>
+              <p class="font-mono text-[10px] sm:text-xs text-[#8D929A] tracking-widest uppercase mt-1">
+                DEPARTMENT OF ELECTRICAL &amp; ELECTRONICS ENGINEERING
+              </p>
+            </div>
+
+            <div class="text-left sm:text-right font-mono">
+              <span class="text-[10px] text-[#E50914] tracking-widest font-bold block uppercase">
+                ANOMALY DATABASE SYSTEM
+              </span>
+              <span class="text-xs text-[#F0F0F5] tracking-wider block font-semibold">
+                FILE SYSTEM // 02K26
+              </span>
+              <span class="text-[9px] text-[#8D929A] tracking-widest block uppercase mt-0.5">
+                CLASSIFIED DOSSIER REPOSITORY
+              </span>
+            </div>
+          </header>
+
+          <!-- MAIN BODY CONTENT GRID (LEFT DATA / RIGHT QR VERIFICATION MODULE) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-stretch flex-1">
+
+            <!-- LEFT & CENTER DATA PANEL (8 COLS) -->
+            <div class="lg:col-span-8 flex flex-col justify-between space-y-6">
+
+              <!-- CASE FILE IDENTIFIER & MAIN TITLE -->
+              <div class="space-y-2">
+                <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+                  <span class="px-2.5 py-0.5 rounded bg-[#E50914]/20 border border-[#E50914]/50 text-[#E50914] font-bold uppercase tracking-wider text-[11px]">
+                    ANOMALY FILE
+                  </span>
+                  <span class="text-[#8D929A]">//</span>
+                  <span class="text-[#F0F0F5] font-bold tracking-wider text-sm sm:text-base font-mono" id="dossier-case-header-id">
+                    CASE // EX-2026-XXXXXX
+                  </span>
+                </div>
+
+                <div class="pt-1">
+                  <h2 class="font-headline text-3xl sm:text-4xl md:text-5xl text-white font-extrabold tracking-tight uppercase leading-none">
+                    ANOMALY FILE
+                  </h2>
+                  <p class="font-mono text-xs sm:text-sm text-[#E50914] tracking-widest font-semibold uppercase mt-1 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">radar</span> REGISTRATION ANOMALY DETECTED
+                  </p>
+                </div>
+              </div>
+
+              <!-- ANOMALY STATUS DUAL BADGE -->
+              <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
+                <div class="px-3 py-1.5 rounded-lg bg-[#E50914]/15 border border-[#E50914]/40 text-[#E50914] font-bold flex items-center gap-2 shadow-sm">
+                  <span class="w-2 h-2 rounded-full bg-[#E50914] animate-ping"></span>
+                  <span>● ANOMALY DETECTED</span>
+                </div>
+
+                <div class="px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-[#10B981] font-bold flex items-center gap-2 shadow-sm">
+                  <span class="material-symbols-outlined text-sm">check_circle</span>
+                  <span>✓ REGISTRATION VERIFIED</span>
+                </div>
+              </div>
+
+              <!-- SUBJECT IDENTITY SECTION -->
+              <div class="p-4 sm:p-5 rounded-xl bg-[#0C0E12]/80 border border-white/10 space-y-1.5 shadow-md relative overflow-hidden">
+                <div class="absolute right-3 top-3 text-[10px] font-mono text-[#E50914]/40 font-bold uppercase tracking-widest">
+                  [ PARTICIPANT TELEMETRY ]
+                </div>
+                <label class="block font-mono text-[10px] sm:text-[11px] text-[#E50914] uppercase tracking-widest font-bold">
+                  SUBJECT IDENTITY
+                </label>
+                <div id="dossier-subject-name" class="font-headline text-xl sm:text-2xl md:text-3xl font-extrabold text-white uppercase tracking-wide leading-tight break-words">
+                  --
+                </div>
+              </div>
+
+              <!-- ORIGIN & ASSIGNED EVENT DUAL GRID -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- ORIGIN SECTION (COLLEGE) -->
+                <div class="p-4 rounded-xl bg-[#0C0E12]/80 border border-white/10 space-y-1 shadow-md">
+                  <label class="block font-mono text-[10px] text-[#8D929A] uppercase tracking-widest font-bold">
+                    ORIGIN // INSTITUTE
+                  </label>
+                  <div id="dossier-origin-college" class="font-mono text-xs sm:text-sm font-semibold text-[#F0F0F5] uppercase leading-snug break-words">
+                    --
+                  </div>
+                </div>
+
+                <!-- ASSIGNED EVENT SECTION -->
+                <div class="p-4 rounded-xl bg-[#0C0E12]/80 border border-[#E50914]/30 space-y-1 shadow-md relative">
+                  <label class="block font-mono text-[10px] text-[#E50914] uppercase tracking-widest font-bold">
+                    ASSIGNED EVENT TRACK
+                  </label>
+                  <div id="dossier-assigned-event" class="font-headline text-base sm:text-lg font-bold text-[#E50914] uppercase tracking-wider">
+                    --
+                  </div>
+                  <div id="dossier-event-timing" class="font-mono text-[10px] text-[#8D929A] block mt-0.5">
+                    LOYALTY – 3 BLOCK (C-BLOCK)
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- CASE ID & REGISTERED DATE METADATA -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+                
+                <div class="p-3.5 rounded-xl bg-[#141A21]/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] text-[#8D929A] uppercase block">CASE ID</span>
+                    <span class="font-mono text-sm font-bold text-white tracking-wider" id="dossier-case-id">EX-2026-XXXXXX</span>
+                  </div>
+                  <span class="material-symbols-outlined text-[#E50914] text-xl">fingerprint</span>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-[#141A21]/60 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] text-[#8D929A] uppercase block">DETECTED / REGISTERED</span>
+                    <span class="font-mono text-sm font-bold text-[#F0F0F5]" id="dossier-registered-date">SEP 26, 2026</span>
+                  </div>
+                  <span class="material-symbols-outlined text-[#8D929A] text-xl">event</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- RIGHT VERIFICATION MODULE (4 COLS) -->
+            <div class="lg:col-span-4 p-5 sm:p-6 rounded-2xl bg-[#0C0E12]/90 border border-white/15 flex flex-col justify-between items-center text-center space-y-5 shadow-2xl relative">
+              
+              <div class="w-full border-b border-white/10 pb-3 flex items-center justify-between">
+                <span class="font-mono text-xs text-[#E50914] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">qr_code_2</span> VERIFICATION
+                </span>
+                <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+              </div>
+
+              <!-- DYNAMIC QR CODE CONTAINER (220px x 220px) -->
+              <div class="relative p-3 rounded-2xl bg-white border-2 border-[#E50914]/40 shadow-[0_0_30px_rgba(255,255,255,0.1)] flex items-center justify-center">
+                <canvas id="dossier-qr-canvas" class="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] block"></canvas>
+              </div>
+
+              <!-- SCAN TO VERIFY INSTRUCTIONS -->
+              <div class="space-y-1 font-mono">
+                <span class="text-xs text-white font-bold tracking-widest uppercase block">
+                  SCAN TO VERIFY
+                </span>
+                <span class="text-[10px] text-[#8D929A] uppercase tracking-wider block">
+                  OFFICIAL REGISTRATION RECORD
+                </span>
+              </div>
+
+              <!-- VERIFICATION STATUS BADGE -->
+              <div class="w-full p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-center space-y-1">
+                <div class="font-mono text-xs text-[#10B981] font-bold uppercase tracking-widest flex items-center justify-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                  <span>● VALID</span>
+                </div>
+                <div class="font-mono text-[10px] text-emerald-300/90 font-medium uppercase tracking-wider">
+                  EXOUSIA REGISTRATION CONFIRMED
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- BOTTOM SYSTEM FOOTER & EEE TECHNICAL TELEMETRY -->
+          <footer class="pt-4 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 font-mono text-[10px] text-[#8D929A]">
+            
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-[#E50914] font-bold">SYSTEM // ONLINE</span>
+              <span>•</span>
+              <span>SIGNAL // STABLE</span>
+              <span>•</span>
+              <span>NODE // ACTIVE</span>
+              <span>•</span>
+              <span>CHANNEL // EXOUSIA-EEE</span>
+            </div>
+
+            <div class="text-left sm:text-right text-[9px] text-[#8D929A]/80 uppercase">
+              IEI — VVITU STUDENT CHAPTER • DEPARTMENT OF EEE
+            </div>
+
+          </footer>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </main>
+
+  <script type="module" src="/src/pass.js"></script>
+</body>
+</html>

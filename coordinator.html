@@ -2,7 +2,8 @@
 <html class="dark" lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#050709"/>
   <title>EXOUSIA 2K26 — Event Coordinator Desk</title>
 
   <!-- Google Fonts & Icons -->
@@ -11,141 +12,381 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
   <link rel="stylesheet" href="/src/style.css"/>
 </head>
-<body class="bg-black text-on-surface font-sans antialiased min-h-screen selection:bg-primary selection:text-white">
+<body class="bg-[#050709] text-[#F3E7D3] font-sans antialiased min-h-screen selection:bg-[#E50914]/30 selection:text-[#F3E7D3] flex flex-col">
 
   <!-- Header Banner -->
-  <header class="border-b border-outline-variant/30 bg-surface-container-lowest/90 backdrop-blur-md sticky top-0 z-30 py-4 px-4 sm:px-8">
+  <header class="border-b border-white/10 bg-[#080B0F]/90 backdrop-blur-md sticky top-0 z-30 py-3.5 px-4 sm:px-8">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-2xl">badge</span>
+        <div class="w-8 h-8 rounded-lg bg-[#E50914]/15 border border-[#E50914]/30 flex items-center justify-center text-[#E50914]">
+          <span class="material-symbols-outlined text-xl">badge</span>
+        </div>
         <div>
-          <h1 class="font-stranger-title text-xl sm:text-2xl text-primary tracking-wider uppercase">EXOUSIA 2K26</h1>
-          <p class="font-label-mono text-[11px] text-on-surface-variant uppercase tracking-widest">RESTRICTED EVENT COORDINATOR PORTAL</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-headline text-lg sm:text-xl text-[#E50914] tracking-wider uppercase font-bold">EXOUSIA 2K26</h1>
+            <span class="text-xs text-[#737B85] font-mono">//</span>
+            <span class="font-mono text-xs text-[#F3E7D3] uppercase tracking-widest font-semibold">EVENT COORDINATOR PORTAL</span>
+          </div>
+          <p class="font-mono text-[10px] text-[#A9B0B8] uppercase tracking-wider">OFFICIAL PARTICIPANT MANAGEMENT &amp; VERIFICATION DESK</p>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="text-[10px] text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-500/40 font-label-mono font-bold flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PRIVACY SAFE API
+
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+        <span class="text-[10px] text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-md border border-emerald-500/30 font-mono font-semibold flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PRIVACY ENFORCED API
         </span>
-        <a href="/" class="btn-terminal-secondary text-xs px-3 py-1.5 font-label-mono flex items-center gap-1">
+        <button id="coord-key-prompt-btn" type="button" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-[#E50914]/50 text-[#F3E7D3] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">key</span> <span id="coord-key-btn-label">ACCESS KEY</span>
+        </button>
+        <a href="/" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/10 hover:border-white/20 text-[#F3E7D3] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5">
           <span class="material-symbols-outlined text-sm">home</span> HOME
         </a>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-8 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto py-6 px-4 sm:px-8 space-y-6">
 
-    <!-- Security & Privacy Notice -->
-    <div class="p-3.5 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-between gap-3 font-label-mono text-xs text-on-surface-variant">
+    <!-- Privacy Notice Bar -->
+    <div class="p-3.5 rounded-xl bg-[#0F141C] border border-white/10 flex items-center justify-between gap-3 font-mono text-xs text-[#A9B0B8]">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary text-base">lock_clock</span>
-        <span>Coordinators view participant metrics strictly scoped by assigned event token. Phone numbers are stripped at the backend API level.</span>
+        <span class="material-symbols-outlined text-[#00F0FF] text-base">verified_user</span>
+        <span>Coordinators inspect &amp; verify registrations strictly scoped by assigned event access keys. Private data is stripped server-side.</span>
       </div>
-      <span class="text-[10px] text-primary/80 font-bold uppercase tracking-wider hidden sm:inline-block">ZERO PII LEAKS</span>
+      <span class="text-[10px] text-[#00F0FF] font-bold uppercase tracking-wider hidden sm:inline-block">ZERO PII LEAKS</span>
     </div>
 
-    <!-- Controls Row: Key Input, Event Selector & Search -->
-    <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+    <!-- 1. EVENT SELECTOR CARDS (CENTRAL LANDING ENTRY UX) -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between font-mono">
+        <span class="text-xs text-[#00F0FF] uppercase tracking-widest font-bold flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">grid_view</span> SELECT YOUR ASSIGNED EVENT TRACK
+        </span>
+        <span class="text-[10px] text-[#A9B0B8]">OFFICIAL DESK SCOPE</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
         
-        <!-- Auth Key Input -->
-        <div class="md:col-span-4 space-y-1">
-          <label class="block font-label-mono text-[10px] text-primary uppercase tracking-widest font-bold">COORDINATOR SECRET KEY</label>
-          <input id="coord-key-input" type="password" placeholder="Enter coordinator secret key..." class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
+        <!-- CARD 1: CLUE'D UP -->
+        <div data-event="CLUE'D UP" class="event-select-card group bg-[#0F141C] p-4 rounded-2xl border border-white/10 hover:border-[#E50914] cursor-pointer transition-all duration-300 space-y-2 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] text-[#E50914] font-bold tracking-widest uppercase">DAY 1 — SEP 30</span>
+            <span class="w-2 h-2 rounded-full bg-[#E50914]"></span>
+          </div>
+          <h3 class="font-headline text-lg font-bold text-white group-hover:text-[#E50914] transition-colors">CLUE'D UP</h3>
+          <p class="text-[11px] text-[#A9B0B8]">Loyalty – 3 Block • 3 Members</p>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-[#737B85]">
+            <span>TREASURE HUNT</span>
+            <span class="text-[#E50914] font-bold group-hover:underline">ENTER DESK &rarr;</span>
+          </div>
         </div>
 
-        <!-- Event Scoped Selector -->
-        <div class="md:col-span-4 space-y-1">
-          <label class="block font-label-mono text-[10px] text-primary uppercase tracking-widest font-bold">SELECT ASSIGNED EVENT</label>
-          <select id="coord-event-select" class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer">
-            <option value="CLUE'D UP" selected>DAY 1 — CLUE'D UP</option>
-            <option value="HAWKINS TRAP">DAY 1 — HAWKINS TRAP</option>
-            <option value="DARK PROTOCOL">DAY 2 — DARK PROTOCOL</option>
-            <option value="GENOVA">DAY 2 — GENOVA</option>
-          </select>
+        <!-- CARD 2: HAWKINS TRAP -->
+        <div data-event="HAWKINS TRAP" class="event-select-card group bg-[#0F141C] p-4 rounded-2xl border border-white/10 hover:border-[#E50914] cursor-pointer transition-all duration-300 space-y-2 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] text-[#E50914] font-bold tracking-widest uppercase">DAY 1 — SEP 30</span>
+            <span class="w-2 h-2 rounded-full bg-[#E50914]"></span>
+          </div>
+          <h3 class="font-headline text-lg font-bold text-white group-hover:text-[#E50914] transition-colors">HAWKINS TRAP</h3>
+          <p class="text-[11px] text-[#A9B0B8]">Loyalty – 3 Block • 2 Members</p>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-[#737B85]">
+            <span>SPEED GAUNTLET</span>
+            <span class="text-[#E50914] font-bold group-hover:underline">ENTER DESK &rarr;</span>
+          </div>
         </div>
 
-        <!-- Participant Search Input -->
-        <div class="md:col-span-4 space-y-1">
-          <label class="block font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">SEARCH PARTICIPANTS</label>
-          <div class="relative">
-            <input id="coord-search-input" type="text" placeholder="Type name, college, email..." class="w-full bg-surface-container border border-outline-variant/50 p-3 pl-10 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
-            <span class="material-symbols-outlined text-on-surface-variant text-base absolute left-3 top-3">search</span>
+        <!-- CARD 3: DARK PROTOCOL -->
+        <div data-event="DARK PROTOCOL" class="event-select-card group bg-[#0F141C] p-4 rounded-2xl border border-white/10 hover:border-[#00F0FF] cursor-pointer transition-all duration-300 space-y-2 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] text-[#00F0FF] font-bold tracking-widest uppercase">DAY 2 — OCT 01</span>
+            <span class="w-2 h-2 rounded-full bg-[#00F0FF]"></span>
+          </div>
+          <h3 class="font-headline text-lg font-bold text-white group-hover:text-[#00F0FF] transition-colors">DARK PROTOCOL</h3>
+          <p class="text-[11px] text-[#A9B0B8]">Loyalty – 3 Block • 4 Members</p>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-[#737B85]">
+            <span>4-ROUND DECODING</span>
+            <span class="text-[#00F0FF] font-bold group-hover:underline">ENTER DESK &rarr;</span>
+          </div>
+        </div>
+
+        <!-- CARD 4: GENOVA -->
+        <div data-event="GENOVA" class="event-select-card group bg-[#0F141C] p-4 rounded-2xl border border-white/10 hover:border-[#10B981] cursor-pointer transition-all duration-300 space-y-2 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-[10px] text-[#10B981] font-bold tracking-widest uppercase">DAY 2 — OCT 01</span>
+            <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+          </div>
+          <h3 class="font-headline text-lg font-bold text-white group-hover:text-[#10B981] transition-colors">GENOVA</h3>
+          <p class="text-[11px] text-[#A9B0B8]">Computer Lab • Single Player</p>
+          <div class="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-[#737B85]">
+            <span>AI CREATIVE LAB</span>
+            <span class="text-[#10B981] font-bold group-hover:underline">ENTER DESK &rarr;</span>
           </div>
         </div>
 
       </div>
     </div>
 
-    <!-- Summary Metrics Card -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-label-mono">
-      
-      <div class="panel-terminal-glass p-5 rounded-2xl border border-primary/40 flex items-center justify-between">
-        <div>
-          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT HEADCOUNT</span>
-          <span class="text-3xl font-bold text-primary mt-1 block" id="stat-total-count">0</span>
-          <span class="text-[11px] text-on-surface-variant/80 mt-0.5 block" id="stat-event-name">CLUE'D UP</span>
+    <!-- 2. COORDINATOR AUTHENTICATION PANEL (UNAUTHENTICATED ENTRY STATE) -->
+    <div id="coord-auth-panel" class="bg-[#0F141C] p-6 sm:p-8 rounded-2xl border border-white/10 space-y-5 shadow-2xl max-w-xl mx-auto my-6">
+      <div class="flex items-center gap-3 border-b border-white/10 pb-4">
+        <div class="w-10 h-10 rounded-xl bg-[#E50914]/15 border border-[#E50914]/30 flex items-center justify-center text-[#E50914]">
+          <span class="material-symbols-outlined text-2xl">key</span>
         </div>
-        <span class="material-symbols-outlined text-primary/40 text-4xl">groups</span>
+        <div>
+          <h2 class="font-headline text-lg font-bold text-white uppercase tracking-wider">COORDINATOR ACCESS REQUIRED</h2>
+          <p class="font-mono text-xs text-[#A9B0B8]">AUTHENTICATE TO ACCESS <span class="text-[#00F0FF] font-bold" id="auth-target-event">CLUE'D UP</span> DESK</p>
+        </div>
       </div>
 
-      <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 flex items-center justify-between">
-        <div>
-          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT DATE</span>
-          <span class="text-sm font-bold text-on-surface mt-1 block" id="stat-event-date">SEPTEMBER 30</span>
-          <span class="text-[11px] text-on-surface-variant/80 mt-0.5 block" id="stat-event-time">9:30 AM – 3:00 PM</span>
+      <form id="coord-auth-form" class="space-y-4">
+        <div class="space-y-1.5 font-mono">
+          <label class="block text-xs text-[#A9B0B8] uppercase tracking-wider font-semibold">ENTER EVENT ACCESS KEY</label>
+          <div class="relative">
+            <input id="coord-key-input" type="password" placeholder="e.g. COORD-CLUEDUP-2026" autocomplete="off" class="w-full bg-[#141A21] border border-white/15 p-3.5 pl-10 text-[#F3E7D3] placeholder-[#737B85] font-mono text-sm rounded-xl focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all uppercase tracking-wider" required />
+            <span class="material-symbols-outlined text-[#737B85] text-lg absolute left-3 top-3.5">lock</span>
+          </div>
         </div>
-        <span class="material-symbols-outlined text-on-surface-variant/40 text-3xl">calendar_today</span>
-      </div>
 
-      <div class="panel-terminal-glass p-5 rounded-2xl border border-outline-variant/40 flex items-center justify-between">
-        <div>
-          <span class="text-[10px] text-on-surface-variant uppercase tracking-wider block">EVENT VENUE</span>
-          <span class="text-sm font-bold text-on-surface mt-1 block" id="stat-event-venue">LOYALTY – 3 BLOCK</span>
-          <span class="text-[11px] text-emerald-400 font-bold mt-0.5 block">READY FOR ENTRY</span>
+        <!-- Dynamic Auth Error Notice -->
+        <div id="coord-auth-error" class="hidden p-3.5 rounded-xl bg-red-950/80 border border-red-500/40 text-red-400 font-mono text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">error</span>
+          <span id="coord-auth-error-text">Invalid access key for selected event.</span>
         </div>
-        <span class="material-symbols-outlined text-on-surface-variant/40 text-3xl">location_on</span>
-      </div>
 
+        <button type="submit" id="btn-submit-desk-access" class="w-full py-3.5 rounded-xl bg-[#E50914] hover:bg-[#E50914]/90 text-white font-mono text-xs font-bold uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-base">login</span> [ ENTER COORDINATOR DESK ]
+        </button>
+      </form>
     </div>
 
-    <!-- Participant Roster Table -->
-    <div class="panel-terminal-glass p-4 sm:p-6 rounded-2xl border border-outline-variant/40 overflow-hidden space-y-4">
-      <div class="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-        <span class="font-label-mono text-xs text-primary font-bold tracking-widest uppercase flex items-center gap-2">
-          <span class="material-symbols-outlined text-base">table_chart</span> PARTICIPANT ROSTER (<span id="table-record-count">0</span> RECORDS)
-        </span>
-        <button id="coord-refresh-btn" class="btn-terminal-secondary text-xs px-3 py-1 font-label-mono flex items-center gap-1">
-          <span class="material-symbols-outlined text-sm">refresh</span> REFRESH
+    <!-- 3. PROTECTED COORDINATOR DASHBOARD CONTAINER (AUTHENTICATED STATE) -->
+    <div id="coord-protected-dashboard" class="hidden space-y-6">
+
+      <!-- Offline Roster Mode Banner Indicator -->
+      <div id="coord-offline-banner" class="hidden p-3.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-300 font-mono text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-lg">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-amber-400 text-lg">wifi_off</span>
+          <span class="font-bold">⚡ OFFLINE ROSTER MODE</span>
+          <span class="text-white/80">—</span>
+          <span id="coord-offline-sync-date" class="text-amber-200/90 font-medium">LAST SYNCED: SEP 27, 2026, 09:45 AM</span>
+        </div>
+        <span class="text-[10px] text-amber-400/90 uppercase tracking-wider font-semibold">"Offline roster is a saved snapshot. Sync before the event."</span>
+      </div>
+
+      <!-- Active Desk Status Bar -->
+      <div class="bg-[#0F141C] p-4 rounded-xl border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 font-mono">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs text-emerald-400 font-bold tracking-wider uppercase">AUTHENTICATED DESK:</span>
+          <span id="authenticated-event-title" class="text-xs font-bold text-white uppercase bg-white/5 px-2.5 py-1 rounded border border-white/10">CLUE'D UP</span>
+        </div>
+        <button id="btn-logout-coord" type="button" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-red-500/50 text-[#A9B0B8] hover:text-red-400 text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+          <span class="material-symbols-outlined text-sm">logout</span> CHANGE EVENT / LOG OUT
         </button>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left font-label-mono text-xs border-collapse">
-          <thead>
-            <tr class="border-b border-outline-variant/30 text-on-surface-variant uppercase text-[10px] tracking-wider">
-              <th class="py-3 px-3">#</th>
-              <th class="py-3 px-3">REG ID</th>
-              <th class="py-3 px-3">PARTICIPANT NAME</th>
-              <th class="py-3 px-3">COLLEGE / INSTITUTE</th>
-              <th class="py-3 px-3">EMAIL ADDRESS</th>
-              <th class="py-3 px-3">DATE</th>
-              <th class="py-3 px-3">STATUS</th>
-            </tr>
-          </thead>
-          <tbody id="coord-table-body" class="divide-y divide-outline-variant/20 text-on-surface">
-            <tr>
-              <td colspan="7" class="py-8 text-center text-on-surface-variant">Enter coordinator secret key to view records...</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Verification & Search Tools Bar -->
+      <div class="bg-[#0F141C] p-4 sm:p-5 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+          
+          <!-- Assigned Event Scope Selector Dropdown -->
+          <div class="w-full md:w-1/3 space-y-1">
+            <label class="block font-mono text-[10px] text-[#00F0FF] uppercase tracking-widest font-bold">ASSIGNED EVENT TRACK</label>
+            <div class="relative">
+              <select id="coord-event-select" class="w-full bg-[#141A21] border border-white/15 p-3 pr-10 text-[#F3E7D3] font-mono text-xs rounded-xl focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none cursor-pointer appearance-none">
+                <option value="CLUE'D UP" selected>DAY 1 — CLUE'D UP</option>
+                <option value="HAWKINS TRAP">DAY 1 — HAWKINS TRAP</option>
+                <option value="DARK PROTOCOL">DAY 2 — DARK PROTOCOL</option>
+                <option value="GENOVA">DAY 2 — GENOVA</option>
+              </select>
+              <span class="material-symbols-outlined text-[#A9B0B8] text-base absolute right-3 top-3.5 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- Verification Action Tools (Search & QR Scanner) -->
+          <div class="w-full md:w-2/3 flex flex-col sm:flex-row gap-2.5 items-end">
+            
+            <!-- Participant Search Input -->
+            <div class="w-full space-y-1">
+              <label class="block font-mono text-[10px] text-[#A9B0B8] uppercase tracking-widest font-medium">VERIFY REGISTRATION</label>
+              <div class="relative">
+                <input id="coord-search-input" type="text" placeholder="Search name, college, or registration ID..." class="w-full bg-[#141A21] border border-white/15 p-3 pl-10 text-[#F3E7D3] placeholder-[#737B85] font-mono text-xs rounded-xl focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] outline-none transition-all uppercase" />
+                <span class="material-symbols-outlined text-[#737B85] text-base absolute left-3 top-3.5">search</span>
+              </div>
+            </div>
+
+            <!-- Search Registration ID Button -->
+            <button id="coord-btn-search-id" type="button" class="w-full sm:w-auto whitespace-nowrap px-4 py-3 rounded-xl bg-[#141A21] border border-white/20 hover:border-white/40 text-white font-mono text-xs transition-colors flex items-center justify-center gap-1.5 font-bold cursor-pointer">
+              <span class="material-symbols-outlined text-base">search</span> [ SEARCH REGISTRATION ID ]
+            </button>
+
+            <!-- Camera QR Scanner Button -->
+            <button id="coord-btn-scan-qr" type="button" class="w-full sm:w-auto whitespace-nowrap px-4 py-3 rounded-xl bg-[#E50914]/15 border border-[#E50914]/40 hover:bg-[#E50914]/30 text-white font-mono text-xs transition-colors flex items-center justify-center gap-2 font-bold cursor-pointer shadow-md">
+              <span class="material-symbols-outlined text-base">qr_code_scanner</span> [ SCAN QR ]
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- Live Verification Result Notice Card -->
+        <div id="coord-verify-result-card" class="hidden p-4 rounded-xl border font-mono text-xs transition-all space-y-3">
+          <!-- Injected via JS dynamically -->
+        </div>
       </div>
+
+      <!-- Summary Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+        
+        <div class="bg-[#0F141C] p-5 rounded-2xl border border-[#E50914]/30 flex items-center justify-between shadow-lg">
+          <div>
+            <span class="text-[10px] text-[#A9B0B8] uppercase tracking-wider block font-semibold">EVENT HEADCOUNT</span>
+            <span class="text-3xl font-bold text-[#E50914] mt-1 block" id="stat-total-count">0</span>
+            <span class="text-[11px] text-[#A9B0B8]/80 mt-0.5 block font-medium" id="stat-event-name">CLUE'D UP</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-[#E50914]/10 border border-[#E50914]/20 flex items-center justify-center text-[#E50914]">
+            <span class="material-symbols-outlined text-2xl">groups</span>
+          </div>
+        </div>
+
+        <div class="bg-[#0F141C] p-5 rounded-2xl border border-white/10 flex items-center justify-between shadow-lg">
+          <div>
+            <span class="text-[10px] text-[#A9B0B8] uppercase tracking-wider block font-semibold">EVENT DATE</span>
+            <span class="text-sm font-bold text-[#F3E7D3] mt-1 block" id="stat-event-date">SEPTEMBER 30</span>
+            <span class="text-[11px] text-[#A9B0B8]/80 mt-0.5 block" id="stat-event-time">9:30 AM – 3:00 PM</span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#A9B0B8]">
+            <span class="material-symbols-outlined text-2xl">calendar_today</span>
+          </div>
+        </div>
+
+        <div class="bg-[#0F141C] p-5 rounded-2xl border border-white/10 flex items-center justify-between shadow-lg">
+          <div>
+            <span class="text-[10px] text-[#A9B0B8] uppercase tracking-wider block font-semibold">EVENT VENUE</span>
+            <span class="text-sm font-bold text-[#F3E7D3] mt-1 block" id="stat-event-venue">LOYALTY – 3 BLOCK</span>
+            <span class="text-[11px] text-emerald-400 font-bold mt-0.5 block flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> READY FOR ENTRY
+            </span>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#A9B0B8]">
+            <span class="material-symbols-outlined text-2xl">location_on</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Participant Roster Table Container -->
+      <div class="bg-[#0F141C] p-4 sm:p-6 rounded-2xl border border-white/10 space-y-4 shadow-xl relative overflow-hidden">
+        
+        <div class="flex items-center justify-between border-b border-white/10 pb-3 font-mono">
+          <span class="text-xs text-[#00F0FF] font-bold tracking-widest uppercase flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">table_chart</span> PARTICIPANT ROSTER (<span id="table-record-count">0</span> REGISTERED)
+          </span>
+          <div class="flex items-center gap-2">
+            <button id="coord-save-offline-btn" type="button" class="px-3.5 py-1.5 rounded-lg bg-[#00F0FF]/15 border border-[#00F0FF]/40 hover:bg-[#00F0FF]/30 text-[#00F0FF] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer font-bold">
+              <span class="material-symbols-outlined text-sm">download_for_offline</span> SAVE ROSTER FOR OFFLINE USE
+            </button>
+            <button id="coord-refresh-btn" class="px-3 py-1.5 rounded-lg bg-[#141A21] border border-white/15 hover:border-white/30 text-[#F3E7D3] hover:text-white font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">refresh</span> REFRESH
+            </button>
+          </div>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="overflow-x-auto min-h-[300px]">
+          <table class="w-full text-left font-mono text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-white/10 text-[#737B85] uppercase text-[10px] tracking-widest bg-[#141A21]">
+                <th class="py-3 px-4 font-bold">#</th>
+                <th class="py-3 px-4 font-bold">NAME</th>
+                <th class="py-3 px-4 font-bold">REGISTRATION ID</th>
+                <th class="py-3 px-4 font-bold">COLLEGE / INSTITUTE</th>
+                <th class="py-3 px-4 font-bold">MASKED EMAIL</th>
+                <th class="py-3 px-4 font-bold">REGISTERED DATE</th>
+                <th class="py-3 px-4 font-bold">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="coord-table-body" class="divide-y divide-white/5 text-[#F3E7D3]">
+              <!-- Dynamic rows populated via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile List View -->
+        <div id="coord-mobile-list" class="space-y-3 block md:hidden">
+          <!-- Dynamic mobile cards populated via JS -->
+        </div>
+
+        <!-- Overlay 1: Loading State -->
+        <div id="coord-state-loading" class="hidden absolute inset-0 bg-[#050709]/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20">
+          <span class="material-symbols-outlined text-[#00F0FF] text-3xl animate-spin">sync</span>
+          <span class="font-mono text-xs text-[#00F0FF] uppercase tracking-widest font-semibold">LOADING PARTICIPANTS...</span>
+        </div>
+
+        <!-- Overlay 2: Empty State -->
+        <div id="coord-state-empty" class="hidden py-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-white/5 mx-auto flex items-center justify-center text-[#737B85]">
+            <span class="material-symbols-outlined text-2xl">folder_off</span>
+          </div>
+          <h3 class="font-mono text-sm font-bold text-[#F3E7D3] uppercase tracking-wider">NO PARTICIPANTS YET</h3>
+          <p class="font-mono text-xs text-[#A9B0B8] max-w-sm mx-auto">Registrations for this event track will appear here after confirmation.</p>
+        </div>
+
+        <!-- Overlay 3: No Offline Roster Saved State -->
+        <div id="coord-state-no-offline" class="hidden py-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+            <span class="material-symbols-outlined text-2xl">cloud_off</span>
+          </div>
+          <h3 class="font-mono text-sm font-bold text-[#F3E7D3] uppercase tracking-wider">NO OFFLINE ROSTER SAVED</h3>
+          <p class="font-mono text-xs text-[#A9B0B8] max-w-md mx-auto" id="no-offline-msg">
+            Connect to the internet and click "SAVE ROSTER FOR OFFLINE USE" to cache records for this event track.
+          </p>
+        </div>
+
+      </div>
+
     </div>
 
   </main>
+
+  <!-- CAMERA QR SCANNER MODAL -->
+  <div id="coord-qr-modal" class="hidden fixed inset-0 z-50 bg-[#050709]/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full bg-[#0F141C] border border-[#E50914]/40 rounded-2xl p-5 space-y-4 shadow-2xl relative">
+      
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <span class="font-mono text-xs text-[#E50914] font-bold tracking-widest uppercase flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">qr_code_scanner</span> SCAN PARTICIPANT ANOMALY FILE
+        </span>
+        <button id="btn-close-qr-modal" type="button" class="text-[#A9B0B8] hover:text-white font-mono text-xs cursor-pointer">
+          ✕ CLOSE
+        </button>
+      </div>
+
+      <!-- Camera Viewport Container -->
+      <div class="relative w-full aspect-square max-w-xs mx-auto overflow-hidden rounded-xl border border-[#E50914]/40 bg-black shadow-2xl flex items-center justify-center">
+        <video id="modal-scanner-video" playsinline class="w-full h-full object-cover hidden"></video>
+        <canvas id="modal-scanner-canvas" class="hidden"></canvas>
+
+        <div id="modal-scanner-placeholder" class="text-center space-y-3 p-4">
+          <span class="material-symbols-outlined text-4xl text-[#E50914] animate-pulse">photo_camera</span>
+          <p class="font-mono text-xs text-[#A9B0B8]">Camera starting...<br />Point at participant Anomaly File QR.</p>
+        </div>
+      </div>
+
+      <div class="text-center space-y-2">
+        <p class="font-mono text-[11px] text-[#A9B0B8]">Align QR code within the frame to verify registration identity.</p>
+        <button id="btn-stop-modal-camera" type="button" class="w-full py-2.5 rounded-xl bg-[#141A21] border border-white/15 text-white font-mono text-xs hover:border-white/30 cursor-pointer">
+          CANCEL CAMERA
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <script type="module" src="/src/coordinator.js"></script>
 </body>

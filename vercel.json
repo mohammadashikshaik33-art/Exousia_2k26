@@ -5,13 +5,23 @@
     { "source": "/verify", "destination": "/verify.html" },
     { "source": "/coordinator", "destination": "/coordinator.html" },
     { "source": "/feedback", "destination": "/feedback.html" },
+    { "source": "/pass", "destination": "/pass.html" },
     { "source": "/audio-test", "destination": "/audio-test.html" },
     { "source": "/api/auth/google/start", "destination": "/api/auth/google?action=start" },
     { "source": "/api/auth/google/callback", "destination": "/api/auth/google?action=callback" },
     { "source": "/api/cron/feedback-day1", "destination": "/api/cron/feedback?day=day1" },
-    { "source": "/api/cron/feedback-day2", "destination": "/api/cron/feedback?day=day2" }
+    { "source": "/api/cron/feedback-day2", "destination": "/api/cron/feedback?day=day2" },
+    { "source": "/api/email/send-otp", "destination": "/api/email/otp?action=send" },
+    { "source": "/api/email/verify-otp", "destination": "/api/email/otp?action=verify" },
+    { "source": "/api/admin/resend-remaining-emails", "destination": "/api/admin/retry-email?action=resend-remaining" },
+    { "source": "/api/cron/process-outbox", "destination": "/api/admin/retry-email?action=resend-remaining" },
+    { "source": "/api/send-feedback-email", "destination": "/api/cron/feedback" }
   ],
   "crons": [
+    {
+      "path": "/api/cron/process-outbox",
+      "schedule": "0 0 * * *"
+    },
     {
       "path": "/api/cron/feedback-day1",
       "schedule": "0 13 30 9 *"

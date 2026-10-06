@@ -17,6 +17,9 @@
   },
   "dependencies": {
     "jsqr": "^1.4.0",
-    "qrcode": "^1.5.4"
+    "opentype.js": "^2.0.0",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.4"
   }
 }

@@ -1,6 +1,5 @@
 // Vercel Serverless Cron Handler — Day 1 & Day 2 Feedback Automatic Dispatcher
 // Routes: GET /api/cron/feedback-day1 & GET /api/cron/feedback-day2
-// Trigger: Automated Vercel Cron on Day 1 & Day 2 completion
 
 import { sendGmailEmail } from '../../lib/gmail.js';
 
@@ -36,7 +35,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    const regRes = await fetch(`${supabaseUrl}/rest/v1/registrations?select=id,confirmation_code,primary_name,primary_email,team_name`, {
+    // Check if campaign has been cancelled via admin workflow
+    const schedCheck = await fetch(
+      `${supabaseUrl}/rest/v1/email_outbox?recipient=eq.SYSTEM_CAMPAIGN&subject=eq.CAMPAIGN_SCHEDULE_${dayParam.toUpperCase()}&select=body&order=created_at.desc&limit=1`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      }
+    );
+
+    if (schedCheck.ok) {
+      const rows = await schedCheck.json();
+      if (Array.isArray(rows) && rows[0]) {
+        try {
+          const data = JSON.parse(rows[0].body || '{}');
+          if (data.status === 'CANCELLED') {
+            return res.status(200).json({
+              success: true,
+              message: `${dayParam.toUpperCase()} feedback delivery was cancelled by admin schedule. Skipping cron execution.`,
+              skipped: true
+            });
+          }
+        } catch (e) {
+          // continue
+        }
+      }
+    }
+
+    const regRes = await fetch(`${supabaseUrl}/rest/v1/registrations?select=id,confirmation_code,primary_name,primary_email,team_name,status&status=eq.confirmed`, {
       headers: {
         'apikey': supabaseKey,
         'Authorization': `Bearer ${supabaseKey}`
@@ -49,16 +77,21 @@ export default async function handler(req, res) {
 
     const allRegistrations = await regRes.json();
     const dayRegistrations = allRegistrations.filter(rec => {
+      if (rec.team_name === 'EMAIL_VERIFICATION') return false;
       const track = (rec.team_name || '').toUpperCase();
       if (dayParam === 'day1') {
-        return track.includes('CLUE\'D UP') || track.includes('HAWKINS TRAP') || track.includes('DAY 1');
+        return track.includes("CLUE'D UP") || track.includes('HAWKINS TRAP') || track.includes('DAY 1') || true;
       } else {
-        return track.includes('DARK PROTOCOL') || track.includes('GENOVA') || track.includes('DAY 2');
+        return track.includes('DARK PROTOCOL') || track.includes('GENOVA') || track.includes('DAY 2') || true;
       }
     });
 
     let sent = 0;
     let skipped = 0;
+
+    const closingMessageHtml = dayParam === 'day1'
+      ? `Hope you enjoyed Day 1 of EXOUSIA 2K26 and reached home safely. Thank you for being part of the experience. We'll see you tomorrow for Day 2. Your presence is precious. ❤️`
+      : `Hope you enjoyed Day 2 of EXOUSIA 2K26 and reached home safely. Thank you for making EXOUSIA 2K26 special with your presence. Your presence is precious. We hope to see you again at the next EXOUSIA. ❤️`;
 
     for (const rec of dayRegistrations) {
       const email = rec.primary_email;
@@ -66,7 +99,7 @@ export default async function handler(req, res) {
       if (!email) continue;
 
       // Idempotency Check
-      const outboxCheck = await fetch(`${supabaseUrl}/rest/v1/email_outbox?recipient=eq.${encodeURIComponent(email)}&subject=ilike.*FEEDBACK_${dayParam.toUpperCase()}*&select=id`, {
+      const outboxCheck = await fetch(`${supabaseUrl}/rest/v1/email_outbox?recipient=eq.${encodeURIComponent(email)}&subject=ilike.*FEEDBACK_${dayParam.toUpperCase()}*&select=id,status`, {
         headers: {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`
@@ -75,7 +108,7 @@ export default async function handler(req, res) {
 
       if (outboxCheck.ok) {
         const existing = await outboxCheck.json();
-        if (Array.isArray(existing) && existing.length > 0) {
+        if (Array.isArray(existing) && existing.some(item => item.status === 'sent')) {
           skipped++;
           continue;
         }
@@ -88,23 +121,25 @@ export default async function handler(req, res) {
       const outboxSubject = `FEEDBACK_${dayParam.toUpperCase()} — ${emailSubject}`;
 
       const emailBodyText = dayParam === 'day1'
-        ? `Thank you for being part of Day 1 of EXOUSIA 2K26!\n\nWe hope you enjoyed today's events, had a great time with us, and reached home safely.\n\nYour experience matters to us. It will take only a few minutes to share your feedback and help us make tomorrow and our future events even better.\n\nShare Your Feedback: ${feedbackLink}\n\nHope you enjoyed today's events and reached your home safely. Wishing you to attend Day 2 also. Your presence is precious. ❤️\n\n— Team EXOUSIA 2K26`
-        : `Thank you for being part of Day 2 of EXOUSIA 2K26!\n\nWe hope you enjoyed the experience, learned something new, met new people, and made some good memories with us.\n\nYour feedback genuinely matters. It will help us understand what worked, what didn't, and what we can do better for future events.\n\nShare Your Feedback: ${feedbackLink}\n\nThank you for being a part of EXOUSIA. Your presence made this event special. ❤️\n\n— Team EXOUSIA 2K26`;
+        ? `Thank you for being part of Day 1 of EXOUSIA 2K26!\n\nWe hope you enjoyed today's events, had a great time with us, and reached home safely.\n\nYour experience matters to us. It will take only a few minutes to share your feedback and help us make tomorrow and our future events even better.\n\nShare Your Feedback: ${feedbackLink}\n\n${closingMessageHtml}\n\n— Team EXOUSIA 2K26`
+        : `Thank you for being part of Day 2 of EXOUSIA 2K26!\n\nWe hope you enjoyed the experience, learned something new, met new people, and made some good memories with us.\n\nYour feedback genuinely matters. It will help us understand what worked, what didn't, and what we can do better for future events.\n\nShare Your Feedback: ${feedbackLink}\n\n${closingMessageHtml}\n\n— Team EXOUSIA 2K26`;
 
-      const emailHtmlBody = dayParam === 'day1' ? `
+      const emailHtmlBody = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"/></head>
 <body style="background-color:#0e0e0e; color:#e5e2e1; font-family:'Courier New',monospace; padding:24px;">
-  <div style="max-width:540px; margin:0 auto; background-color:#140e0f; border:1px solid #5a403c; border-radius:12px; padding:28px;">
-    <h2 style="color:#ffb4a8; font-size:22px; margin-top:0; letter-spacing:0.1em; text-transform:uppercase;">EXOUSIA 2K26</h2>
-    <p style="font-size:14px; color:#e3beb8; line-height:1.6;">Thank you for being part of <strong>Day 1 of EXOUSIA 2K26</strong>!</p>
+  <div style="max-width:540px; margin:0 auto; background-color:#140e0f; border:1px solid #e50914; border-radius:12px; padding:28px;">
+    <h2 style="color:#e50914; font-size:22px; margin-top:0; letter-spacing:0.1em; text-transform:uppercase;">EXOUSIA 2K26</h2>
+    <p style="font-size:14px; color:#e3beb8; line-height:1.6;">Thank you for being part of <strong>${dayParam === 'day1' ? 'Day 1' : 'Day 2'} of EXOUSIA 2K26</strong>!</p>
     
     <p style="font-size:13px; color:#e3beb8; line-height:1.6;">
-      We hope you enjoyed today's events, had a great time with us, and reached home safely.
+      ${dayParam === 'day1' 
+        ? "We hope you enjoyed today's events, had a great time with us, and reached home safely."
+        : "We hope you enjoyed the experience, learned something new, met new people, and made some good memories with us."}
     </p>
     <p style="font-size:13px; color:#e3beb8; line-height:1.6;">
-      Your experience matters to us. It will take only a few minutes to share your feedback and help us make tomorrow and our future events even better.
+      Your experience matters to us. It will take only a few minutes to share your feedback and help us make our future events even better.
     </p>
 
     <div style="text-align:center; margin:28px 0;">
@@ -113,38 +148,13 @@ export default async function handler(req, res) {
       </a>
     </div>
 
-    <p style="font-size:13px; color:#ffb4a8; line-height:1.6; font-style:italic;">
-      Hope you enjoyed today's events and reached your home safely. Wishing you to attend Day 2 also. Your presence is precious. ❤️
-    </p>
-    <p style="font-size:12px; color:#aa8984; margin-bottom:0;">— Team EXOUSIA 2K26 // Department of EEE</p>
-  </div>
-</body>
-</html>` : `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"/></head>
-<body style="background-color:#0e0e0e; color:#e5e2e1; font-family:'Courier New',monospace; padding:24px;">
-  <div style="max-width:540px; margin:0 auto; background-color:#140e0f; border:1px solid #5a403c; border-radius:12px; padding:28px;">
-    <h2 style="color:#ffb4a8; font-size:22px; margin-top:0; letter-spacing:0.1em; text-transform:uppercase;">EXOUSIA 2K26</h2>
-    <p style="font-size:14px; color:#e3beb8; line-height:1.6;">Thank you for being part of <strong>Day 2 of EXOUSIA 2K26</strong>!</p>
-    
-    <p style="font-size:13px; color:#e3beb8; line-height:1.6;">
-      We hope you enjoyed the experience, learned something new, met new people, and made some good memories with us.
-    </p>
-    <p style="font-size:13px; color:#e3beb8; line-height:1.6;">
-      Your feedback genuinely matters. It will help us understand what worked, what didn't, and what we can do better for future events.
-    </p>
-
-    <div style="text-align:center; margin:28px 0;">
-      <a href="${feedbackLink}" style="background-color:#e50914; color:#ffffff; font-weight:bold; font-size:14px; padding:14px 28px; text-decoration:none; border-radius:8px; display:inline-block; letter-spacing:0.1em;">
-        SHARE YOUR FEEDBACK ❤️
-      </a>
+    <div style="background-color:#1c1315; border-left:4px solid #e50914; padding:14px; margin:20px 0; border-radius:4px;">
+      <p style="font-size:13px; color:#ffb4a8; line-height:1.6; margin:0; font-style:italic;">
+        ${closingMessageHtml}
+      </p>
     </div>
 
-    <p style="font-size:13px; color:#ffb4a8; line-height:1.6; font-style:italic;">
-      Thank you for being a part of EXOUSIA. Your presence made this event special. ❤️
-    </p>
-    <p style="font-size:12px; color:#aa8984; margin-bottom:0;">— Team EXOUSIA 2K26 // Department of EEE</p>
+    <p style="font-size:12px; color:#aa8984; margin-bottom:0; border-top:1px solid #332225; padding-top:12px;">— Team EXOUSIA 2K26 // Department of EEE</p>
   </div>
 </body>
 </html>`;

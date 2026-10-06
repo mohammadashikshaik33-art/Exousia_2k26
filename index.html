@@ -1202,12 +1202,49 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">EMAIL ADDRESS</label>
-              <input class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="reg-email" placeholder="participant@institution.edu" type="email" required/>
+              <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest flex items-center justify-between">
+                <span>EMAIL ADDRESS</span>
+                <span id="email-verify-badge" class="hidden text-[9px] text-primary font-bold">VERIFICATION REQUIRED</span>
+              </label>
+              <div class="flex items-center gap-2">
+                <input class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="reg-email" placeholder="participant@institution.edu" type="email" required/>
+                <button type="button" class="hidden btn-terminal-secondary px-3 py-3 text-xs font-label-mono cursor-pointer flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap" id="otp-send-btn" disabled>VERIFY EMAIL</button>
+              </div>
+              <p class="text-[10px] text-on-surface-variant/70 font-label-mono mt-1.5 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs text-primary/70">info</span>
+                Please enter your correct email so we can send your confirmation pass and event updates.
+              </p>
             </div>
             <div>
               <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">PHONE / WHATSAPP</label>
               <input class="w-full bg-surface-container border border-outline-variant/50 p-3 text-on-surface font-label-mono rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="reg-phone" placeholder="Phone Number" type="tel" required/>
+            </div>
+          </div>
+
+          <!-- Compact Email OTP Verification Chamber Component -->
+          <div class="hidden p-4 rounded-xl bg-surface-container/90 border border-primary/40 space-y-3 font-label-mono text-xs transition-all duration-300 shadow-xl" id="otp-input-container">
+            <div class="flex items-center justify-between border-b border-outline-variant/30 pb-2">
+              <span class="text-[10px] text-primary tracking-widest uppercase font-bold flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">mark_email_read</span> VERIFICATION CODE
+              </span>
+              <span class="text-[10px] text-primary/80 font-bold" id="otp-timer-display">OTP expires in 10:00</span>
+            </div>
+
+            <div id="otp-section-active" class="space-y-2.5">
+              <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest">ENTER 6-DIGIT OTP</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="otp-code-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Enter 6-digit OTP" class="w-full bg-surface-container-high border border-outline-variant/60 p-2.5 text-center text-on-surface font-label-mono font-bold text-base tracking-[6px] rounded-lg focus:border-primary outline-none transition-all" />
+                <button type="button" id="otp-verify-btn" class="btn-terminal-primary px-4 py-2.5 text-xs font-label-mono cursor-pointer flex-shrink-0 disabled:opacity-50">VERIFY OTP</button>
+              </div>
+              <div class="flex items-center justify-between text-[10px] text-on-surface-variant pt-1 flex-wrap gap-1">
+                <span id="otp-status-msg" class="text-primary font-semibold">Verification code sent.</span>
+                <button type="button" id="otp-resend-btn" class="text-primary hover:underline cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed font-bold" disabled>RESEND OTP</button>
+              </div>
+            </div>
+
+            <!-- Verified State Indicator -->
+            <div id="otp-section-verified" class="hidden p-3 rounded-lg bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-center font-bold text-xs tracking-wider flex items-center justify-center gap-2 shadow-lg">
+              <span class="material-symbols-outlined text-base text-emerald-400">check_circle</span> ✓ EMAIL ADDRESS VERIFIED
             </div>
           </div>
 
@@ -1343,6 +1380,65 @@
 
       <!-- Step 2: Personalized Digital Anomaly Pass Card (PASS 1 SPECIFICATION) -->
       <div class="hidden space-y-6" id="modal-step-pass">
+        
+        <!-- Registration Success Header & Instructions -->
+        <div class="text-center space-y-3 pb-4 border-b border-outline-variant/30">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/90 border border-emerald-500/50 text-emerald-400 font-label-mono text-xs font-bold uppercase tracking-wider shadow-lg">
+            <span class="material-symbols-outlined text-sm">check_circle</span> REGISTRATION CONFIRMED
+          </div>
+          
+          <h2 class="font-stranger-title text-2xl sm:text-3xl stranger-glow tracking-wider text-on-surface uppercase">
+            REGISTRATION SUCCESSFUL
+          </h2>
+          
+          <p class="font-body-md text-on-surface-variant text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+            Your EXOUSIA registration has been successfully recorded.
+          </p>
+
+          <!-- Important Download Guidance Box -->
+          <div class="p-4 rounded-xl bg-surface-container-high/90 border border-primary/40 text-left font-label-mono text-xs space-y-2.5 max-w-xl mx-auto shadow-md">
+            <div class="flex items-center gap-2 text-primary font-bold tracking-wider uppercase text-[11px]">
+              <span class="material-symbols-outlined text-base">file_download</span>
+              <span>IMPORTANT ACTION REQUIRED</span>
+            </div>
+            <p class="text-on-surface text-[11px] leading-relaxed">
+              Please download and save your <strong>EXOUSIA Anomaly File / Digital Pass</strong> now.
+            </p>
+            <div class="grid grid-cols-2 gap-2 text-[10px] text-on-surface-variant pt-1 border-t border-outline-variant/20">
+              <div class="flex items-center gap-1"><span class="text-primary">•</span> Registration ID</div>
+              <div class="flex items-center gap-1"><span class="text-primary">•</span> Participant Details</div>
+              <div class="flex items-center gap-1"><span class="text-primary">•</span> Event Details</div>
+              <div class="flex items-center gap-1"><span class="text-primary">•</span> Signed QR Credential</div>
+            </div>
+            <p class="text-[10px] text-primary/90 font-semibold italic pt-1 border-t border-outline-variant/20">
+              Keep the downloaded file safely on your phone. You will need it for event entry or verification.
+            </p>
+          </div>
+
+          <!-- Secondary Email Notice & Easter Egg -->
+          <div class="p-3.5 rounded-xl bg-surface-container/60 border border-outline-variant/30 text-left font-label-mono text-[11px] space-y-1.5 max-w-xl mx-auto">
+            <div class="flex items-center gap-1.5 text-on-surface-variant font-bold uppercase tracking-wider text-[10px]">
+              <span class="material-symbols-outlined text-xs text-primary">mark_email_read</span>
+              <span>EMAIL NOTICE</span>
+            </div>
+            <p class="text-on-surface-variant/90 text-[10px] leading-relaxed">
+              Your confirmation email is only a secondary communication channel and may be delayed. You do <strong>not</strong> need to wait for the email to access your registration credential.
+            </p>
+            <p class="text-[10px] text-primary/70 italic pt-1.5 border-t border-outline-variant/20">
+              P.S. The anomaly file is already in your hands. The email may take a little longer to cross dimensions. 👀
+            </p>
+          </div>
+        </div>
+
+        <!-- Prominent Main Action Button -->
+        <div class="flex flex-col items-center justify-center gap-2">
+          <button class="w-full sm:max-w-md btn-terminal-primary py-4 px-6 font-label-mono text-sm font-bold tracking-widest flex justify-center items-center gap-2 rounded-xl shadow-2xl cursor-pointer" id="pass-download-btn" type="button">
+            <span class="material-symbols-outlined text-xl">download</span> DOWNLOAD ANOMALY FILE
+          </button>
+          <div class="text-center font-label-mono text-xs min-h-[16px]" id="pass-download-feedback"></div>
+        </div>
+
+        <!-- Digital Pass Card Container -->
         <div class="exousia-digital-pass-card" id="digital-pass-card">
           <!-- Pass Inner Background Overlay / Crimson Atmosphere -->
           <div class="pass-bg-overlay" aria-hidden="true"></div>
@@ -1395,7 +1491,7 @@
               <!-- Status -->
               <div class="space-y-0.5">
                 <span class="pass-info-label">STATUS</span>
-                <p class="pass-info-status" id="pass-display-status">ENTRY AUTHORIZED</p>
+                <p class="pass-info-status" id="pass-display-status">CONFIRMED</p>
               </div>
 
             </div>
@@ -1411,18 +1507,15 @@
           </div>
         </div>
 
-        <!-- Pass Action Buttons -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 pass-action-buttons">
-          <button class="btn-terminal-primary py-3 font-label-mono text-xs flex justify-center items-center gap-2" id="pass-download-btn" type="button">
-            <span class="material-symbols-outlined text-base">download</span> SAVE PASS (PNG)
-          </button>
-          <button class="btn-terminal-secondary py-3 font-label-mono text-xs flex justify-center items-center gap-2" id="pass-print-btn" type="button">
+        <!-- Secondary Utility Actions Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-label-mono text-xs">
+          <button class="btn-terminal-secondary py-3 flex justify-center items-center gap-2" id="pass-print-btn" type="button">
             <span class="material-symbols-outlined text-base">print</span> PRINT PASS
           </button>
-          <button class="btn-terminal-secondary py-3 font-label-mono text-xs flex justify-center items-center gap-2" id="pass-share-btn" type="button">
+          <button class="btn-terminal-secondary py-3 flex justify-center items-center gap-2" id="pass-share-btn" type="button">
             <span class="material-symbols-outlined text-base">share</span> SHARE PASS
           </button>
-          <button class="btn-terminal-secondary py-3 font-label-mono text-xs flex justify-center items-center gap-2" id="pass-new-reg-btn" type="button">
+          <button class="btn-terminal-secondary py-3 flex justify-center items-center gap-2" id="pass-new-reg-btn" type="button">
             <span class="material-symbols-outlined text-base">person_add</span> NEW REGISTRATION
           </button>
         </div>

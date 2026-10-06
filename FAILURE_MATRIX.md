@@ -1,0 +1,24 @@
+# EXOUSIA 2K26 — PRODUCTION FAILURE MATRIX
+
+| Subsystem | Issue Description | Severity | Detection Mechanism | Automatic Recovery Action | Admin / Operator Action | Escalation Policy | Test Status |
+| :--- | :--- | :---: | :--- | :--- | :--- | :--- | :---: |
+| **Registration** | Duplicate submission / request storm | MEDIUM | IP rate-limiter (15 req/10s) & `idempotency_key` unique constraint | API rejects duplicate with HTTP 429 / 409 | Monitor registration rates on Admin Desk | Alert tech lead if spike persists | **PASS** |
+| **Registration** | Duplicate participant registration | LOW | Postgres unique index on `(primary_email, primary_phone)` | API returns HTTP 409 Conflict | Direct participant to view existing pass via `/pass` | Non-critical | **PASS** |
+| **Registration** | Database temporary failure | HIGH | Supabase connection/timeout check | Return HTTP 503 (no fake success), retry client payload | Inspect Supabase dashboard metrics | Escalate to Database Admin | **PASS** |
+| **Registration** | Registration succeeds but email fails | MEDIUM | `email_outbox` decoupled async insertion | Registration remains valid (`CONFIRMED`), email queued | Outbox Supervisor retries email automatically | Non-critical for event entry | **PASS** |
+| **OTP** | Primary Gmail HTTP 429 rate limit | HIGH | `classifyProviderError` detects `429 rateLimitExceeded` | Set rate-limit lock, failover P0 OTP to Backup/Resend | Observe Circuit Breaker state on Admin Panel | Non-critical if fallback works | **PASS** |
+| **OTP** | Backup Gmail unconfigured / missing | MEDIUM | Supervisor checks OAuth token presence | Fallback to Resend API / Primary rate-limit expiry | Configure `BACKUP_GOOGLE_REFRESH_TOKEN` in Vercel | Alert Event Chair | **PASS** |
+| **OTP** | Both Primary & Backup providers fail | CRITICAL | Supervisor records failure on both circuits | OTP returns HTTP 500 honestly (no fake OTP sent) | Pause bulk email via Admin Desk, test providers | Immediate Tech Lead escalation | **PASS** |
+| **OTP** | OTP 30-second resend cooldown active | LOW | `email_verifications` `last_sent_at` check | Return HTTP 429 `RESEND_COOLDOWN_ACTIVE` | User waits 30s before clicking resend | Non-critical | **PASS** |
+| **OTP** | Invalid / expired OTP entered | LOW | HMAC-SHA256 hash comparison & 10m expiry check | Return HTTP 400 `Invalid or expired code`, increment attempts | User requests new OTP | Non-critical | **PASS** |
+| **Email** | Outbox retries hammering Gmail API | HIGH | Supervisor `canProcessOutboxQueue` check | Pause P1-P4 outbox processing during OTP pressure | Pause bulk email manually via Admin button | Non-critical | **PASS** |
+| **Email** | Outbox record stuck in `sending` state | MEDIUM | Supervisor stale check (`updated_at < now - 10m`) | Auto-restore stuck record to `pending` | Click "RECOVER STUCK QUEUE" button on Admin | Non-critical | **PASS** |
+| **Email** | Email recipient invalid / bounces | LOW | Provider returns `validation_error` or 400 invalid | Mark record as `dead_letter` (max 5 retries reached) | Inspect `DEAD LETTER` card in Admin Desk | Update email if participant reports | **PASS** |
+| **Email** | Duplicate email send attempt | MEDIUM | Logical identity `(registration_id + subject + recipient)` | Skip dispatch if status already `sent` | No action required | Non-critical | **PASS** |
+| **Admin** | Unauthorized access attempt | HIGH | `ADMIN_SECRET_KEY` header verification | Return HTTP 401 Unauthorized | Check credentials in secure secret store | Rotate key if compromised | **PASS** |
+| **Admin** | Registration search / filter mismatch | LOW | PostgREST composable query builder (`or=`, `and=`) | Clean server-side filtering without page reloads | Select event track or status dropdown | Non-critical | **PASS** |
+| **Coordinator** | Roster access without authentication | HIGH | Event access key & track scope check | Show "Coordinator link invalid or expired" | Enter authorized track key in header | Alert Track Lead | **PASS** |
+| **Coordinator** | Poor / offline campus network | HIGH | PWA Service Worker & IndexedDB offline roster cache | Local offline roster search & QR verification | Download roster snapshot prior to event | Non-critical | **PASS** |
+| **Coordinator** | QR verification failure / scan error | MEDIUM | jsQR canvas decoding & HMAC signature check | Fallback to manual Registration ID search | Search name/code in Coordinator Desk | Check participant Anomaly Pass | **PASS** |
+| **Deployment** | Vercel Function timeout / crash | HIGH | Vercel runtime logs & HTTP 500 error boundaries | Function auto-restarts, error classified safely | Inspect Vercel production logs | Escalate to Vercel Admin | **PASS** |
+| **Security** | Secret leak / credential exposure | CRITICAL | Git pre-commit & code search scanner | Mask credentials, prohibit token logging | Rotate compromised OAuth/Vercel keys | Immediate Security Incident | **PASS** |

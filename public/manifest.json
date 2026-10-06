@@ -1,0 +1,18 @@
+{
+  "name": "EXOUSIA 2K26 — Technical Registration Credential",
+  "short_name": "EXOUSIA Pass",
+  "description": "Official EXOUSIA 2K26 Anomaly File Credential & Offline Verification Desk.",
+  "start_url": "/pass",
+  "display": "standalone",
+  "background_color": "#050709",
+  "theme_color": "#050709",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/digital-pass-master-clean.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 // Real browser-compatible WebRTC camera QR scanner & manual registration verification
 
 import jsQR from 'jsqr';
+import { verifyCredentialOffline } from './credential-verifier.js';
 
 // Mode tabs & view containers
 const tabCameraMode = document.getElementById('tab-camera-mode');
@@ -268,15 +269,59 @@ function playCinematicLockAnimation(regId) {
 async function performVerification(rawInput) {
   if (!rawInput) return;
 
-  const cleanedId = extractRegistrationId(rawInput);
-  if (!cleanedId) return;
-
   hideAllStates();
   if (stateLoading) stateLoading.classList.remove('hidden');
 
   if (verifySubmitBtn) {
     verifySubmitBtn.disabled = true;
     verifySubmitBtn.innerHTML = 'VERIFYING... <span class="material-symbols-outlined text-base animate-spin">sync</span>';
+  }
+
+  // 1. Check for cryptographically signed offline credential first
+  try {
+    const offlineRes = await verifyCredentialOffline(rawInput);
+    if (offlineRes && offlineRes.valid && offlineRes.credential) {
+      const cred = offlineRes.credential;
+
+      if (!navigator.onLine) {
+        hideAllStates();
+        if (resValidName) resValidName.textContent = (cred.full_name || 'PARTICIPANT').toUpperCase();
+        if (resValidId) resValidId.textContent = cred.registration_id;
+        if (resValidCollege) resValidCollege.textContent = cred.college || 'N/A';
+        let eventDisplay = cred.selected_event || 'N/A';
+        if (eventDisplay.toUpperCase().includes('NEXORA')) {
+          eventDisplay = 'GENOVA (DAY 2)';
+        }
+        if (resValidEvent) resValidEvent.textContent = eventDisplay;
+
+        const badge = document.querySelector('#state-valid .uppercase.tracking-wider');
+        if (badge) {
+          badge.innerHTML = '<span class="material-symbols-outlined text-base">verified</span> OFFLINE CREDENTIAL VERIFIED';
+        }
+        const banner = document.querySelector('#state-valid .tracking-widest.bg-emerald-950\\/80');
+        if (banner) {
+          banner.textContent = 'OFFLINE VERIFICATION • LIVE SERVER CHECK UNAVAILABLE';
+          banner.className = 'font-label-mono text-[10px] text-cyan-400 font-bold uppercase tracking-widest bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30';
+        }
+
+        if (stateValid) stateValid.classList.remove('hidden');
+        return;
+      }
+    }
+  } catch (offlineErr) {
+    console.warn('Offline verification check error:', offlineErr);
+  }
+
+  // 2. Perform live server database lookup
+  const cleanedId = extractRegistrationId(rawInput);
+  if (!cleanedId) {
+    hideAllStates();
+    if (stateInvalidFormat) stateInvalidFormat.classList.remove('hidden');
+    if (verifySubmitBtn) {
+      verifySubmitBtn.disabled = false;
+      verifySubmitBtn.innerHTML = '<span class="material-symbols-outlined text-base">verified</span> VERIFY CREDENTIAL';
+    }
+    return;
   }
 
   try {
@@ -286,7 +331,6 @@ async function performVerification(rawInput) {
     });
 
     const resData = await response.json().catch(() => ({}));
-
     hideAllStates();
 
     if (response.status === 422) {
@@ -295,6 +339,22 @@ async function performVerification(rawInput) {
       }
       if (stateInvalidFormat) stateInvalidFormat.classList.remove('hidden');
     } else if (!response.ok) {
+      // Offline fallback on server response error
+      const offlineRes = await verifyCredentialOffline(rawInput);
+      if (offlineRes && offlineRes.valid && offlineRes.credential) {
+        const cred = offlineRes.credential;
+        if (resValidName) resValidName.textContent = (cred.full_name || 'PARTICIPANT').toUpperCase();
+        if (resValidId) resValidId.textContent = cred.registration_id;
+        if (resValidCollege) resValidCollege.textContent = cred.college || 'N/A';
+        if (resValidEvent) resValidEvent.textContent = cred.selected_event || 'N/A';
+        const badge = document.querySelector('#state-valid .uppercase.tracking-wider');
+        if (badge) {
+          badge.innerHTML = '<span class="material-symbols-outlined text-base">verified</span> OFFLINE CREDENTIAL VERIFIED';
+        }
+        if (stateValid) stateValid.classList.remove('hidden');
+        return;
+      }
+
       if (resErrorMsg) {
         resErrorMsg.textContent = resData.message || 'Verification service unconfigured or database unreachable.';
       }
@@ -309,6 +369,17 @@ async function performVerification(rawInput) {
         eventDisplay = 'GENOVA (DAY 2)';
       }
       if (resValidEvent) resValidEvent.textContent = eventDisplay;
+
+      const badge = document.querySelector('#state-valid .uppercase.tracking-wider');
+      if (badge) {
+        badge.innerHTML = '<span class="material-symbols-outlined text-base">check_circle</span> ✓ VERIFIED';
+      }
+      const banner = document.querySelector('#state-valid .tracking-widest.bg-emerald-950\\/80');
+      if (banner) {
+        banner.textContent = 'ENTRY AUTHORIZED';
+        banner.className = 'font-label-mono text-[10px] text-emerald-400/90 font-bold uppercase tracking-widest bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30';
+      }
+
       if (stateValid) stateValid.classList.remove('hidden');
     } else {
       if (resNotFoundMsg) {
@@ -319,6 +390,30 @@ async function performVerification(rawInput) {
 
   } catch (err) {
     console.error('Verification Request Error:', err);
+    // Offline fallback on network exception
+    const offlineRes = await verifyCredentialOffline(rawInput);
+    if (offlineRes && offlineRes.valid && offlineRes.credential) {
+      hideAllStates();
+      const cred = offlineRes.credential;
+      if (resValidName) resValidName.textContent = (cred.full_name || 'PARTICIPANT').toUpperCase();
+      if (resValidId) resValidId.textContent = cred.registration_id;
+      if (resValidCollege) resValidCollege.textContent = cred.college || 'N/A';
+      if (resValidEvent) resValidEvent.textContent = cred.selected_event || 'N/A';
+
+      const badge = document.querySelector('#state-valid .uppercase.tracking-wider');
+      if (badge) {
+        badge.innerHTML = '<span class="material-symbols-outlined text-base">verified</span> OFFLINE CREDENTIAL VERIFIED';
+      }
+      const banner = document.querySelector('#state-valid .tracking-widest.bg-emerald-950\\/80');
+      if (banner) {
+        banner.textContent = 'OFFLINE VERIFICATION • LIVE SERVER CHECK UNAVAILABLE';
+        banner.className = 'font-label-mono text-[10px] text-cyan-400 font-bold uppercase tracking-widest bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30';
+      }
+
+      if (stateValid) stateValid.classList.remove('hidden');
+      return;
+    }
+
     hideAllStates();
     if (resErrorMsg) {
       resErrorMsg.textContent = '[ ERROR ]: CONNECTION FAILED. VERIFICATION SERVICE UNREACHABLE.';

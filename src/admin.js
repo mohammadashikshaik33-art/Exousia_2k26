@@ -1,3 +1,4 @@
+import './style.css';
 import QRCode from 'qrcode';
 
 // State Management for EXOUSIA Admin Workspace
@@ -214,9 +215,13 @@ function initAdmin() {
   if (detailCloseBtn && detailModal) {
     detailCloseBtn.addEventListener('click', () => {
       detailModal.classList.remove('modal-open');
+      detailModal.classList.add('hidden');
     });
     detailModal.addEventListener('click', (e) => {
-      if (e.target === detailModal) detailModal.classList.remove('modal-open');
+      if (e.target === detailModal) {
+        detailModal.classList.remove('modal-open');
+        detailModal.classList.add('hidden');
+      }
     });
   }
 
@@ -224,9 +229,13 @@ function initAdmin() {
   if (passCloseBtn && passPreviewModal) {
     passCloseBtn.addEventListener('click', () => {
       passPreviewModal.classList.remove('modal-open');
+      passPreviewModal.classList.add('hidden');
     });
     passPreviewModal.addEventListener('click', (e) => {
-      if (e.target === passPreviewModal) passPreviewModal.classList.remove('modal-open');
+      if (e.target === passPreviewModal) {
+        passPreviewModal.classList.remove('modal-open');
+        passPreviewModal.classList.add('hidden');
+      }
     });
   }
 
@@ -234,6 +243,7 @@ function initAdmin() {
     detailViewPassBtn.addEventListener('click', () => {
       if (currentDetailRecord) {
         detailModal.classList.remove('modal-open');
+        detailModal.classList.add('hidden');
         openPassPreviewModal(currentDetailRecord);
       }
     });
@@ -252,6 +262,9 @@ function initAdmin() {
   if (btnSaveEmergencyUrl) {
     btnSaveEmergencyUrl.addEventListener('click', () => saveEmergencyUrl());
   }
+
+  // Feedback Workflow Event Listeners
+  setupFeedbackWorkflowListeners();
 
   // Initial Fetch
   fetchRegistrations();
@@ -272,6 +285,8 @@ async function fetchRegistrations() {
 
   if (adminSecret) {
     loadSystemStatus();
+    loadFeedbackWorkflowStatus();
+    loadEmailDeliveryMetrics();
   }
 
   if (!adminSecret) {
@@ -400,6 +415,36 @@ function renderTableRows(records) {
       ? new Date(row.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
       : 'N/A';
 
+    const confState = row.confirmation_status || 'CONFIRMATION_QUEUED';
+    const apState = row.apology_status || 'NONE';
+
+    let confBadgeClass = 'bg-[#0F141C] border border-amber-500/40 text-amber-400';
+    let confText = confState.replace(/_/g, ' ');
+
+    if (confState === 'CONFIRMATION_PROVIDER_ACCEPTED' || confState === 'CONFIRMATION_SENT') {
+      confBadgeClass = 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-400';
+      confText = 'PROVIDER ACCEPTED';
+    } else if (confState === 'CONFIRMATION_RETRYING') {
+      confBadgeClass = 'bg-amber-950/60 border border-amber-500/40 text-amber-400 animate-pulse';
+      confText = 'RETRYING';
+    } else if (confState === 'PERMANENT_FAILURE') {
+      confBadgeClass = 'bg-red-950/60 border border-red-500/40 text-red-400';
+      confText = 'PERMANENT FAILURE';
+    } else if (confState === 'CONFIRMATION_QUEUED') {
+      confBadgeClass = 'bg-[#141A21] border border-white/20 text-[#A9B0B8]';
+      confText = 'QUEUED';
+    }
+
+    let apBadgeClass = 'bg-[#141A21] border border-white/10 text-[#737B85]';
+    let apText = 'NONE';
+    if (apState === 'APOLOGY_SENT') {
+      apBadgeClass = 'bg-purple-950/60 border border-purple-500/40 text-purple-300 font-bold';
+      apText = 'APOLOGY SENT';
+    } else if (apState === 'APOLOGY_QUEUED') {
+      apBadgeClass = 'bg-amber-950/60 border border-amber-500/40 text-amber-300 font-bold';
+      apText = 'APOLOGY QUEUED';
+    }
+
     tr.innerHTML = `
       <td class="py-3 px-4 text-primary font-bold tracking-wider select-text">${escapeHtml(row.registration_id)}</td>
       <td class="py-3 px-4 font-semibold text-on-surface select-text">${escapeHtml(row.full_name)}</td>
@@ -410,8 +455,13 @@ function renderTableRows(records) {
         </span>
       </td>
       <td class="py-3 px-4">
-        <span class="inline-block font-label-mono text-[9px] px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 font-bold uppercase tracking-wider">
-          ${escapeHtml(row.status || 'REGISTERED')}
+        <span class="inline-block font-label-mono text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${confBadgeClass}">
+          ${escapeHtml(confText)}
+        </span>
+      </td>
+      <td class="py-3 px-4">
+        <span class="inline-block font-label-mono text-[9px] px-2 py-0.5 rounded uppercase tracking-wider ${apBadgeClass}">
+          ${escapeHtml(apText)}
         </span>
       </td>
       <td class="py-3 px-4 text-on-surface-variant text-[11px] whitespace-nowrap">${escapeHtml(formattedDate)}</td>
@@ -459,6 +509,8 @@ function openDetailModal(record) {
   const createdEl = document.getElementById('detail-created');
   const updatedEl = document.getElementById('detail-updated');
   const qrPayloadEl = document.getElementById('detail-qr-payload');
+  const attemptsEl = document.getElementById('detail-attempts-count');
+  const timelineEl = document.getElementById('detail-email-timeline');
 
   if (nameEl) nameEl.textContent = (record.full_name || 'PARTICIPANT').toUpperCase();
   if (collegeEl) collegeEl.textContent = record.college || 'N/A';
@@ -470,8 +522,58 @@ function openDetailModal(record) {
   if (createdEl) createdEl.textContent = record.created_at ? new Date(record.created_at).toLocaleString() : 'N/A';
   if (updatedEl) updatedEl.textContent = record.updated_at ? new Date(record.updated_at).toLocaleString() : 'N/A';
   if (qrPayloadEl) qrPayloadEl.textContent = `EXOUSIA:${record.registration_id}`;
+  if (attemptsEl) attemptsEl.textContent = `${record.attempts || 0} ATTEMPTS RECORDED`;
 
-  if (detailModal) detailModal.classList.add('modal-open');
+  // Render Step-by-Step Email Events Timeline
+  if (timelineEl) {
+    timelineEl.innerHTML = '';
+    const timeline = record.timeline || [
+      {
+        event: 'REGISTRATION_CREATED',
+        title: 'Registration Created',
+        timestamp: record.created_at || new Date().toISOString(),
+        status: 'COMPLETED',
+        detail: 'Participant registration successfully recorded in Supabase Postgres'
+      }
+    ];
+
+    timeline.forEach(step => {
+      const stepDiv = document.createElement('div');
+      stepDiv.className = 'p-2.5 rounded-lg bg-[#0F141C] border border-white/10 flex items-start gap-3.5';
+
+      let icon = 'info';
+      let iconColor = 'text-[#00F0FF]';
+      if (step.status === 'COMPLETED') {
+        icon = 'check_circle';
+        iconColor = 'text-emerald-400';
+      } else if (step.status === 'FAILED' || step.status === 'PERMANENT_FAILURE') {
+        icon = 'error';
+        iconColor = 'text-red-400';
+      } else if (step.status === 'RETRYING' || step.status === 'PENDING') {
+        icon = 'hourglass_top';
+        iconColor = 'text-amber-400';
+      }
+
+      const formattedTs = step.timestamp ? new Date(step.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'N/A';
+
+      stepDiv.innerHTML = `
+        <span class="material-symbols-outlined text-base ${iconColor} mt-0.5 flex-shrink-0">${icon}</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between font-bold text-xs text-[#F3E7D3]">
+            <span>${escapeHtml(step.title)}</span>
+            <span class="text-[10px] text-[#737B85] font-normal">${escapeHtml(formattedTs)}</span>
+          </div>
+          <p class="text-[11px] text-[#A9B0B8] mt-0.5 leading-snug">${escapeHtml(step.detail)}</p>
+        </div>
+      `;
+      timelineEl.appendChild(stepDiv);
+    });
+  }
+
+  if (detailModal) {
+    detailModal.classList.remove('hidden');
+    detailModal.classList.add('modal-open');
+  }
 }
 
 // Open Digital Pass Preview Modal
@@ -518,7 +620,10 @@ async function openPassPreviewModal(record) {
     }
   }
 
-  if (passPreviewModal) passPreviewModal.classList.add('modal-open');
+  if (passPreviewModal) {
+    passPreviewModal.classList.remove('hidden');
+    passPreviewModal.classList.add('modal-open');
+  }
 }
 
 // Update Operational Metrics Cards
@@ -672,9 +777,405 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+// ============================================================
+// FEEDBACK WORKFLOW MANAGEMENT LOGIC
+// ============================================================
+let activeFbDay = 'day1';
+let fbWorkflowData = null;
+
+function setupFeedbackWorkflowListeners() {
+  const day1Tab = document.getElementById('admin-fb-day1-tab');
+  const day2Tab = document.getElementById('admin-fb-day2-tab');
+  const btnSendNow = document.getElementById('btn-fb-send-now');
+  const btnRetry = document.getElementById('btn-fb-retry-failed');
+  const btnCancelSched = document.getElementById('btn-fb-cancel-schedule');
+  const btnSaveSched = document.getElementById('btn-fb-save-schedule');
+
+  const sendNowModal = document.getElementById('fb-send-now-modal');
+  const modalCloseBtn = document.getElementById('fb-modal-close-btn');
+  const modalCancelBtn = document.getElementById('fb-modal-cancel-btn');
+  const modalConfirmSendBtn = document.getElementById('fb-modal-confirm-send-btn');
+
+  if (day1Tab) {
+    day1Tab.addEventListener('click', () => switchFbDay('day1'));
+  }
+  if (day2Tab) {
+    day2Tab.addEventListener('click', () => switchFbDay('day2'));
+  }
+
+  if (btnSendNow && sendNowModal) {
+    btnSendNow.addEventListener('click', () => {
+      const modalDayTitle = document.getElementById('modal-fb-day-title');
+      const conflictWarning = document.getElementById('modal-fb-conflict-warning');
+      
+      if (modalDayTitle) modalDayTitle.textContent = activeFbDay === 'day1' ? 'DAY 1' : 'DAY 2';
+
+      const metrics = fbWorkflowData?.metrics?.[activeFbDay];
+      if (metrics && metrics.status === 'SCHEDULED' && conflictWarning) {
+        conflictWarning.classList.remove('hidden');
+      } else if (conflictWarning) {
+        conflictWarning.classList.add('hidden');
+      }
+
+      sendNowModal.classList.remove('hidden');
+    });
+  }
+
+  if (modalCloseBtn && sendNowModal) {
+    modalCloseBtn.addEventListener('click', () => sendNowModal.classList.add('hidden'));
+  }
+  if (modalCancelBtn && sendNowModal) {
+    modalCancelBtn.addEventListener('click', () => sendNowModal.classList.add('hidden'));
+  }
+
+  if (modalConfirmSendBtn && sendNowModal) {
+    modalConfirmSendBtn.addEventListener('click', async () => {
+      sendNowModal.classList.add('hidden');
+      await executeFbAction('send-now');
+    });
+  }
+
+  if (btnSaveSched) {
+    btnSaveSched.addEventListener('click', async () => {
+      const dtInput = document.getElementById('fb-schedule-datetime');
+      const val = dtInput?.value;
+      if (!val) {
+        alert('Please select a valid date and time in IST for scheduling.');
+        return;
+      }
+      await executeFbAction('schedule', { scheduled_at: val });
+    });
+  }
+
+  if (btnCancelSched) {
+    btnCancelSched.addEventListener('click', async () => {
+      if (confirm(`Are you sure you want to cancel the scheduled ${activeFbDay.toUpperCase()} feedback campaign?`)) {
+        await executeFbAction('cancel-schedule');
+      }
+    });
+  }
+
+  if (btnRetry) {
+    btnRetry.addEventListener('click', async () => {
+      await executeFbAction('retry-failed');
+    });
+  }
+}
+
+function switchFbDay(dayKey) {
+  activeFbDay = dayKey;
+  const day1Tab = document.getElementById('admin-fb-day1-tab');
+  const day2Tab = document.getElementById('admin-fb-day2-tab');
+
+  if (day1Tab && day2Tab) {
+    if (dayKey === 'day1') {
+      day1Tab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-[#E50914] text-white';
+      day2Tab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-[#A9B0B8] hover:text-[#F3E7D3]';
+    } else {
+      day2Tab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer bg-[#E50914] text-white';
+      day1Tab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-[#A9B0B8] hover:text-[#F3E7D3]';
+    }
+  }
+
+  updateFbMetricsUI();
+}
+
+async function loadFeedbackWorkflowStatus() {
+  if (!adminSecret) return;
+  try {
+    const res = await fetch(`/api/admin/feedback-workflow?day=${activeFbDay}&secret=${encodeURIComponent(adminSecret)}`, {
+      headers: {
+        'Authorization': `Bearer ${adminSecret}`,
+        'X-Admin-Secret': adminSecret
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.metrics) {
+        fbWorkflowData = data;
+        updateFbMetricsUI();
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch Feedback Workflow status:', err);
+  }
+}
+
+function updateFbMetricsUI() {
+  if (!fbWorkflowData || !fbWorkflowData.metrics) return;
+  const metrics = fbWorkflowData.metrics[activeFbDay] || {};
+
+  const eligibleEl = document.getElementById('fb-metric-eligible');
+  const sentEl = document.getElementById('fb-metric-sent');
+  const failedEl = document.getElementById('fb-metric-failed');
+  const pendingEl = document.getElementById('fb-metric-pending');
+  const scheduleEl = document.getElementById('fb-metric-schedule');
+  const btnRetry = document.getElementById('btn-fb-retry-failed');
+  const btnCancelSched = document.getElementById('btn-fb-cancel-schedule');
+
+  if (eligibleEl) eligibleEl.textContent = (metrics.eligible ?? 0).toLocaleString();
+  if (sentEl) sentEl.textContent = (metrics.sent ?? 0).toLocaleString();
+  if (failedEl) failedEl.textContent = (metrics.failed ?? 0).toLocaleString();
+  if (pendingEl) pendingEl.textContent = (metrics.pending ?? 0).toLocaleString();
+
+  if (btnRetry) {
+    btnRetry.disabled = (metrics.failed ?? 0) === 0;
+  }
+
+  if (scheduleEl) {
+    if (metrics.status === 'SCHEDULED' && metrics.scheduled_at) {
+      const dt = new Date(metrics.scheduled_at);
+      scheduleEl.textContent = dt.toLocaleString('en-IN', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Kolkata'
+      }) + ' IST';
+      scheduleEl.className = 'text-[10px] font-bold text-amber-400 block truncate';
+      if (btnCancelSched) btnCancelSched.classList.remove('hidden');
+    } else if (metrics.status === 'RUNNING') {
+      scheduleEl.textContent = 'DISPATCHING...';
+      scheduleEl.className = 'text-[10px] font-bold text-emerald-400 block truncate animate-pulse';
+      if (btnCancelSched) btnCancelSched.classList.add('hidden');
+    } else if (metrics.status === 'COMPLETED') {
+      scheduleEl.textContent = 'COMPLETED';
+      scheduleEl.className = 'text-[10px] font-bold text-emerald-400 block truncate';
+      if (btnCancelSched) btnCancelSched.classList.add('hidden');
+    } else {
+      scheduleEl.textContent = 'NOT SCHEDULED';
+      scheduleEl.className = 'text-[10px] font-bold text-[#737B85] block truncate';
+      if (btnCancelSched) btnCancelSched.classList.add('hidden');
+    }
+  }
+}
+
+async function executeFbAction(actionName, extraPayload = {}) {
+  if (!adminSecret) return;
+  try {
+    const payload = {
+      action: actionName,
+      day: activeFbDay,
+      secret: adminSecret,
+      ...extraPayload
+    };
+
+    const res = await fetch('/api/admin/feedback-workflow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminSecret}`,
+        'X-Admin-Secret': adminSecret
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.success) {
+      alert(`[ SUCCESS ]: ${data.message || 'Operation executed successfully.'}`);
+      await loadFeedbackWorkflowStatus();
+    } else {
+      alert(`[ FAILURE ]: ${data.message || 'Action failed.'}`);
+    }
+  } catch (err) {
+    console.error('Feedback Workflow Action error:', err);
+    alert('[ ERROR ]: Network or server failure executing action.');
+  }
+}
+
+// --- EMAIL DELIVERY & CONFIRMATION RECOVERY DESK CONTROLLER ---
+const btnResendRemaining = document.getElementById('btn-resend-remaining-confirmations');
+const emailStatSent = document.getElementById('email-stat-sent');
+const emailStatApologySent = document.getElementById('email-stat-apology-sent');
+const emailStatFailed = document.getElementById('email-stat-failed');
+const emailStatRemaining = document.getElementById('email-stat-remaining');
+const emailLastRetryTime = document.getElementById('email-last-retry-time');
+const emailRecoveryLogBox = document.getElementById('email-recovery-log-box');
+const recoveryLogTitle = document.getElementById('recovery-log-title');
+const recoveryLogDetails = document.getElementById('recovery-log-details');
+
+async function loadEmailDeliveryMetrics() {
+  if (!adminSecret) return;
+  try {
+    const res = await fetch('/api/admin/settings?action=system-health', {
+      headers: {
+        'Authorization': `Bearer ${adminSecret}`,
+        'X-Admin-Secret': adminSecret
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        const stats = data.outboxStats || {};
+        const health = data.health || {};
+        const providers = health.providers || {};
+
+        if (emailStatSent) emailStatSent.textContent = (stats.sent ?? 0).toLocaleString();
+        if (emailStatApologySent) emailStatApologySent.textContent = (stats.apologySent ?? 0).toLocaleString();
+        if (emailStatFailed) emailStatFailed.textContent = (stats.failed ?? stats.pending ?? 0).toLocaleString();
+        const emailStatDeadLetter = document.getElementById('email-stat-dead-letter');
+        if (emailStatDeadLetter) emailStatDeadLetter.textContent = (stats.dead_letter ?? 0).toLocaleString();
+        if (emailStatRemaining) emailStatRemaining.textContent = (stats.totalRemaining ?? (stats.failed + stats.pending) ?? 0).toLocaleString();
+
+        // Update Circuit Badges
+        const primaryBadge = document.getElementById('circuit-primary-badge');
+        const backupBadge = document.getElementById('circuit-backup-badge');
+        const resendBadge = document.getElementById('circuit-resend-badge');
+
+        if (primaryBadge) {
+          const st = providers.primary?.state || 'NOT_CONFIGURED';
+          primaryBadge.textContent = st;
+          primaryBadge.className = st === 'HEALTHY' ? 'font-bold text-emerald-400 uppercase' : (st === 'NOT_CONFIGURED' ? 'font-bold text-[#737B85] uppercase' : 'font-bold text-red-400 uppercase animate-pulse');
+        }
+
+        if (backupBadge) {
+          const st = providers.backup?.state || 'NOT_CONFIGURED';
+          backupBadge.textContent = st;
+          backupBadge.className = st === 'HEALTHY' ? 'font-bold text-emerald-400 uppercase' : (st === 'NOT_CONFIGURED' ? 'font-bold text-[#737B85] uppercase' : 'font-bold text-amber-400 uppercase');
+        }
+
+        if (resendBadge) {
+          const st = providers.resend?.state || 'NOT_CONFIGURED';
+          resendBadge.textContent = st;
+          resendBadge.className = st === 'HEALTHY' ? 'font-bold text-[#00F0FF] uppercase' : (st === 'NOT_CONFIGURED' ? 'font-bold text-[#737B85] uppercase' : 'font-bold text-amber-400 uppercase');
+        }
+
+        const btnBulkPause = document.getElementById('btn-toggle-bulk-pause');
+        if (btnBulkPause) {
+          if (health.adminBulkPaused) {
+            btnBulkPause.innerHTML = `<span class="material-symbols-outlined text-sm">play_circle</span> RESUME BULK QUEUE`;
+            btnBulkPause.className = 'px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/60 font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer';
+          } else {
+            btnBulkPause.innerHTML = `<span class="material-symbols-outlined text-sm">pause_circle</span> PAUSE BULK QUEUE`;
+            btnBulkPause.className = 'px-3 py-1.5 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-400 hover:bg-amber-900/60 font-mono text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer';
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load email outbox metrics:', err);
+  }
+}
+
+async function handleSupervisorAction(actionName, payload = {}) {
+  if (!adminSecret) return;
+  try {
+    const res = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminSecret}`,
+        'X-Admin-Secret': adminSecret
+      },
+      body: JSON.stringify({ action: actionName, ...payload })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert(`[ SUPERVISOR ]: ${data.message}`);
+      await loadEmailDeliveryMetrics();
+    } else {
+      alert(`[ FAILURE ]: ${data.message || 'Operation failed.'}`);
+    }
+  } catch (e) {
+    console.error('Supervisor action error:', e);
+    alert('[ ERROR ]: Failed to communicate with Supervisor endpoint.');
+  }
+}
+
+// Bind Supervisor Buttons
+const btnBulkPause = document.getElementById('btn-toggle-bulk-pause');
+const btnTestPrimary = document.getElementById('btn-test-primary-sender');
+const btnTestBackup = document.getElementById('btn-test-backup-sender');
+const btnRecoverQueue = document.getElementById('btn-recover-stuck-queue');
+
+if (btnBulkPause) {
+  btnBulkPause.addEventListener('click', () => {
+    const isPaused = btnBulkPause.textContent.includes('RESUME');
+    handleSupervisorAction(isPaused ? 'resume_bulk' : 'pause_bulk');
+  });
+}
+
+if (btnTestPrimary) {
+  btnTestPrimary.addEventListener('click', () => {
+    const email = prompt('Enter test recipient email address:', 'exousia2k26@gmail.com');
+    if (email && email.trim()) {
+      handleSupervisorAction('test_primary', { recipientEmail: email.trim() });
+    }
+  });
+}
+
+if (btnTestBackup) {
+  btnTestBackup.addEventListener('click', () => {
+    const email = prompt('Enter test recipient email address:', 'exousia2k26@gmail.com');
+    if (email && email.trim()) {
+      handleSupervisorAction('test_backup', { recipientEmail: email.trim() });
+    }
+  });
+}
+
+if (btnRecoverQueue) {
+  btnRecoverQueue.addEventListener('click', () => {
+    if (confirm('Safely recover stuck items in sending state (>10m) back to pending?')) {
+      handleSupervisorAction('recover_stuck_queue');
+    }
+  });
+}
+
+async function handleResendRemainingConfirmations() {
+  if (!adminSecret || !btnResendRemaining) return;
+
+  btnResendRemaining.disabled = true;
+  btnResendRemaining.innerHTML = `<span class="material-symbols-outlined text-sm animate-spin">sync</span> RESENDING REMAINING...`;
+
+  try {
+    const res = await fetch('/api/admin/resend-remaining-emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminSecret}`,
+        'X-Admin-Secret': adminSecret
+      },
+      body: JSON.stringify({ action: 'resend-remaining' })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const lastTimeStr = data.lastRetryTime ? new Date(data.lastRetryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+      if (emailLastRetryTime) emailLastRetryTime.textContent = lastTimeStr;
+
+      if (emailRecoveryLogBox) emailRecoveryLogBox.classList.remove('hidden');
+      if (recoveryLogTitle) recoveryLogTitle.textContent = `Recovery Completed (${lastTimeStr})`;
+      if (recoveryLogDetails) {
+        recoveryLogDetails.textContent = `Apology emails sent: ${data.apologySent || 0} | Confirmation emails sent: ${data.confirmationSent || 0} | Still retryable: ${data.stillRetryable || 0} | Remaining unsent: ${data.remaining || 0}`;
+      }
+
+      await loadEmailDeliveryMetrics();
+    } else {
+      alert(`[ RECOVERY NOTICE ]: ${data.message || 'Unable to execute manual confirmation recovery.'}`);
+    }
+  } catch (err) {
+    console.error('Resend Remaining Error:', err);
+    alert('[ ERROR ]: Network error communicating with serverless endpoint.');
+  } finally {
+    btnResendRemaining.disabled = false;
+    btnResendRemaining.innerHTML = `<span class="material-symbols-outlined text-sm">mark_email_unread</span> RESEND REMAINING CONFIRMATIONS`;
+  }
+}
+
+if (btnResendRemaining) {
+  btnResendRemaining.addEventListener('click', handleResendRemainingConfirmations);
+}
+
 // Initialize on DOM Ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAdmin);
+  document.addEventListener('DOMContentLoaded', () => {
+    initAdmin();
+    loadEmailDeliveryMetrics();
+  });
 } else {
   initAdmin();
+  loadEmailDeliveryMetrics();
 }
+
+

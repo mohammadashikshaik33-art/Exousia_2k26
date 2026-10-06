@@ -21,7 +21,7 @@
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-primary text-2xl">rate_review</span>
         <div>
-          <h1 class="font-stranger-title text-xl sm:text-2xl text-primary tracking-wider uppercase">EXOUSIA 2K26</h1>
+          <h1 class="font-headline text-xl sm:text-2xl text-primary tracking-wider uppercase font-bold">EXOUSIA 2K26</h1>
           <p class="font-label-mono text-[11px] text-on-surface-variant uppercase tracking-widest">PARTICIPANT FEEDBACK PROTOCOL</p>
         </div>
       </div>
@@ -36,8 +36,8 @@
       
       <div>
         <span class="sector-telemetry-tag">/// SECTOR 06: PARTICIPANT EVALUATION</span>
-        <h2 class="font-headline-lg text-2xl sm:text-3xl text-on-surface mt-1">SHARE YOUR EXPERIENCE</h2>
-        <p class="font-body-md text-on-surface-variant text-xs sm:text-sm mt-1">
+        <h2 class="font-headline text-2xl sm:text-3xl text-on-surface mt-1 font-bold" id="fb-heading">SHARE YOUR EXPERIENCE</h2>
+        <p class="font-body-md text-on-surface-variant text-xs sm:text-sm mt-1" id="fb-subheading">
           Your insights shape future editions of EXOUSIA. Please evaluate your event experience below.
         </p>
       </div>
@@ -88,22 +88,46 @@
           <p class="font-label-mono text-[11px] text-amber-400 font-semibold mt-1" id="star-label">5 Stars — Excellent Experience</p>
         </div>
 
-        <!-- What Went Well -->
+        <!-- Event Selection Dropdown (Day-Specific Options) -->
         <div>
-          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">2. WHAT DID YOU ENJOY THE MOST?</label>
-          <textarea id="fb-liked" rows="2" placeholder="Tell us what you liked most about today's events and experience..." class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest" id="fb-event-label">2. WHICH EVENT TRACK DID YOU ATTEND TODAY?</label>
+          <select id="fb-event-select" class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer">
+            <!-- Dynamically populated per day -->
+          </select>
         </div>
 
-        <!-- Areas for Improvement -->
+        <!-- Question 3 (Day Specific Label) -->
         <div>
-          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">3. WHAT COULD WE IMPROVE FOR FUTURE EVENTS?</label>
-          <textarea id="fb-disliked" rows="2" placeholder="What could have been better or handled differently?" class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest" id="fb-q3-label">3. WHAT DID YOU ENJOY THE MOST TODAY?</label>
+          <textarea id="fb-liked" rows="2" placeholder="Share what worked best or made a great impression..." class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
         </div>
 
-        <!-- General Suggestions -->
+        <!-- Question 4 (Day Specific Label) -->
         <div>
-          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">4. ANY OTHER SUGGESTION OR MESSAGE FOR US? (OPTIONAL)</label>
-          <textarea id="fb-suggestions" rows="2" placeholder="Any additional thoughts, appreciation, or suggestions..." class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest" id="fb-q4-label">4. WHAT COULD WE IMPROVE FOR FUTURE EVENTS?</label>
+          <textarea id="fb-disliked" rows="2" placeholder="Tell us what could have been handled better..." class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+        </div>
+
+        <!-- Day 1 Specific: Memorable Moment -->
+        <div id="fb-day1-extra-group">
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">5. MOST MEMORABLE MOMENT OF DAY 1</label>
+          <textarea id="fb-memorable" rows="2" placeholder="What was your favorite moment or highlight of Day 1?" class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
+        </div>
+
+        <!-- Day 2 Specific: Future Attendance Intent Dropdown -->
+        <div id="fb-day2-extra-group" class="hidden">
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest">5. WOULD YOU ATTEND FUTURE EDITIONS OF EXOUSIA?</label>
+          <select id="fb-future-select" class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all cursor-pointer">
+            <option value="Yes, Definitely!">YES, DEFINITELY! ❤️</option>
+            <option value="Maybe">MAYBE 🤔</option>
+            <option value="No">NO ❌</option>
+          </select>
+        </div>
+
+        <!-- Question 6 / General Suggestions -->
+        <div>
+          <label class="block font-label-mono text-[10px] text-on-surface-variant mb-1 uppercase tracking-widest" id="fb-q6-label">6. ANY OTHER SUGGESTION OR MESSAGE FOR US?</label>
+          <textarea id="fb-suggestions" rows="2" placeholder="Any additional thoughts, appreciation, or message for Team EXOUSIA..." class="w-full bg-surface-container border border-outline-variant/50 p-3.5 text-on-surface font-label-mono text-xs rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"></textarea>
         </div>
 
         <button type="submit" id="fb-submit-btn" class="w-full btn-terminal-primary py-4 font-label-mono tracking-widest text-xs flex justify-center items-center gap-2 rounded-xl">

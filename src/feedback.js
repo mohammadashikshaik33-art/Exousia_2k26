@@ -1,5 +1,5 @@
 // EXOUSIA 2K26 — Participant Feedback Portal JS
-// Purpose: Interactive star rating, day selection, URL token parsing, and API submission.
+// Purpose: Interactive star rating, day selection, day-specific options, and API submission.
 
 let selectedRating = 5;
 let selectedDay = 'day1';
@@ -34,6 +34,13 @@ function setDay(dayKey) {
   const dayInput = document.getElementById('fb-day-input');
   const day1Btn = document.getElementById('fb-day1-btn');
   const day2Btn = document.getElementById('fb-day2-btn');
+  const heading = document.getElementById('fb-heading');
+  const subheading = document.getElementById('fb-subheading');
+  const eventSelect = document.getElementById('fb-event-select');
+  const q3Label = document.getElementById('fb-q3-label');
+  const q4Label = document.getElementById('fb-q4-label');
+  const day1ExtraGroup = document.getElementById('fb-day1-extra-group');
+  const day2ExtraGroup = document.getElementById('fb-day2-extra-group');
 
   if (dayInput) dayInput.value = dayKey;
 
@@ -44,6 +51,51 @@ function setDay(dayKey) {
     } else {
       day2Btn.className = 'feedback-day-btn p-3.5 rounded-xl border-2 border-primary bg-primary/20 text-primary font-bold text-center transition-all cursor-pointer shadow-lg';
       day1Btn.className = 'feedback-day-btn p-3.5 rounded-xl border border-outline-variant/40 bg-surface-container/60 text-on-surface-variant font-bold text-center transition-all cursor-pointer';
+    }
+  }
+
+  if (heading) {
+    heading.textContent = dayKey === 'day1' ? 'DAY 1 PARTICIPANT FEEDBACK' : 'DAY 2 PARTICIPANT FEEDBACK';
+  }
+  if (subheading) {
+    subheading.textContent = dayKey === 'day1' 
+      ? 'Please share your thoughts on Day 1 events (CLUE\'D UP, HAWKINS TRAP) and festival organization.'
+      : 'Please share your reflection on Day 2 events (DARK PROTOCOL, GENOVA) and your overall festival experience.';
+  }
+
+  // Populate Event Dropdown Options per Day
+  if (eventSelect) {
+    eventSelect.innerHTML = '';
+    if (dayKey === 'day1') {
+      eventSelect.innerHTML = `
+        <option value="CLUE'D UP">CLUE'D UP — Decoding & Logic Track</option>
+        <option value="HAWKINS TRAP">HAWKINS TRAP — Escape Puzzle Track</option>
+        <option value="GENERAL_DAY1">GENERAL FESTIVAL ATTENDEE</option>
+      `;
+    } else {
+      eventSelect.innerHTML = `
+        <option value="DARK PROTOCOL">DARK PROTOCOL — Team Cyber Security Track</option>
+        <option value="GENOVA">GENOVA — Solo AI & Prompt Engineering Track</option>
+        <option value="GENERAL_DAY2">GENERAL FESTIVAL ATTENDEE</option>
+      `;
+    }
+  }
+
+  if (q3Label) {
+    q3Label.textContent = dayKey === 'day1' ? "3. WHAT DID YOU ENJOY THE MOST ON DAY 1?" : "3. HOW WERE THE TECHNICAL EVENTS & COMPETITIONS?";
+  }
+
+  if (q4Label) {
+    q4Label.textContent = dayKey === 'day1' ? "4. ORGANIZATION & ATMOSPHERE FEEDBACK" : "4. OVERALL FESTIVAL REFLECTION & IMPROVEMENTS";
+  }
+
+  if (day1ExtraGroup && day2ExtraGroup) {
+    if (dayKey === 'day1') {
+      day1ExtraGroup.classList.remove('hidden');
+      day2ExtraGroup.classList.add('hidden');
+    } else {
+      day1ExtraGroup.classList.add('hidden');
+      day2ExtraGroup.classList.remove('hidden');
     }
   }
 }
@@ -94,8 +146,11 @@ function initFeedbackPage() {
       e.preventDefault();
 
       const regId = document.getElementById('fb-reg-id')?.value.trim();
+      const selectedEvent = document.getElementById('fb-event-select')?.value || '';
       const liked = document.getElementById('fb-liked')?.value.trim();
       const disliked = document.getElementById('fb-disliked')?.value.trim();
+      const memorable = document.getElementById('fb-memorable')?.value.trim();
+      const future = document.getElementById('fb-future-select')?.value || '';
       const suggestions = document.getElementById('fb-suggestions')?.value.trim();
 
       if (!regId) {
@@ -117,6 +172,9 @@ function initFeedbackPage() {
           registration_id: regId,
           day: selectedDay,
           rating: selectedRating,
+          selected_event: selectedEvent,
+          memorable_moment: memorable,
+          future_attendance: future,
           liked,
           disliked,
           suggestions

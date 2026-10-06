@@ -1458,13 +1458,16 @@ const init = () => {
     const modalFormFeedback = document.getElementById('modal-form-feedback');
     const modalSubmitBtn = document.getElementById('modal-submit-btn');
 
-    async function drawQrCodeOnCanvas(canvasId, registrationId) {
+    async function drawQrCodeOnCanvas(canvasId, registrationId, signedCredential) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
         const baseUrl = window.location.origin && window.location.origin !== 'null'
             ? window.location.origin
             : 'https://exousia-vert.vercel.app';
-        const payload = `${baseUrl}/verify?id=${encodeURIComponent(registrationId)}`;
+        let payload = `${baseUrl}/verify?id=${encodeURIComponent(registrationId)}`;
+        if (signedCredential && signedCredential.encodedPayload) {
+            payload = `${baseUrl}/verify?c=${encodeURIComponent(signedCredential.encodedPayload)}`;
+        }
         try {
             await QRCode.toCanvas(canvas, payload, {
                 width: 140,
@@ -1492,11 +1495,11 @@ const init = () => {
         const statusEl = document.getElementById('pass-display-status');
         const dateEl = document.getElementById('pass-display-date');
 
-        if (nameEl) nameEl.textContent = (passData.fullName || 'PARTICIPANT NAME').toUpperCase();
+        if (nameEl) nameEl.textContent = (passData.fullName || passData.full_name || 'PARTICIPANT NAME').toUpperCase();
         if (collegeEl) collegeEl.textContent = passData.college || 'Institution';
         if (idEl) idEl.textContent = passData.registration_id;
-        if (trackEl) trackEl.textContent = (passData.selectedEvent || 'DARK PORTAL').toUpperCase();
-        if (statusEl) statusEl.textContent = passData.status ? passData.status.toUpperCase() : 'ENTRY AUTHORIZED';
+        if (trackEl) trackEl.textContent = (passData.selectedEvent || passData.selected_event || 'DARK PORTAL').toUpperCase();
+        if (statusEl) statusEl.textContent = passData.status ? passData.status.toUpperCase() : 'CONFIRMED';
 
         if (dateEl) {
             let formattedDate = 'OCT 01, 2026';
@@ -1515,7 +1518,7 @@ const init = () => {
             dateEl.textContent = formattedDate;
         }
 
-        await drawQrCodeOnCanvas('pass-qr-canvas', passData.registration_id);
+        await drawQrCodeOnCanvas('pass-qr-canvas', passData.registration_id, passData.signed_credential);
 
         const modalGlass = document.querySelector('.panel-modal-glass');
         if (modalGlass) modalGlass.classList.add('pass-mode-wide');
@@ -1591,14 +1594,236 @@ const init = () => {
       }
     };
 
+    // --- OTP VERIFICATION FRONTEND CONTROLLER ---
+    let isEmailVerifiedState = false;
+    let verifiedEmailAddress = '';
+    let otpExpiryTimer = null;
+    let otpCooldownTimer = null;
+
+    const otpSendBtn = document.getElementById('otp-send-btn');
+    const otpInputContainer = document.getElementById('otp-input-container');
+    const otpSectionActive = document.getElementById('otp-section-active');
+    const otpSectionVerified = document.getElementById('otp-section-verified');
+    const otpCodeInput = document.getElementById('otp-code-input');
+    const otpVerifyBtn = document.getElementById('otp-verify-btn');
+    const otpStatusMsg = document.getElementById('otp-status-msg');
+    const otpResendBtn = document.getElementById('otp-resend-btn');
+    const otpTimerDisplay = document.getElementById('otp-timer-display');
+    const emailVerifyBadge = document.getElementById('email-verify-badge');
+
+    function checkEmailSyntaxValidity(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test((email || '').trim());
+    }
+
+    function resetOtpVerificationState() {
+      isEmailVerifiedState = false;
+      verifiedEmailAddress = '';
+      if (otpExpiryTimer) clearInterval(otpExpiryTimer);
+      if (otpCooldownTimer) clearInterval(otpCooldownTimer);
+
+      if (otpInputContainer) otpInputContainer.classList.add('hidden');
+      if (otpSectionVerified) otpSectionVerified.classList.add('hidden');
+      if (otpSectionActive) otpSectionActive.classList.remove('hidden');
+      if (emailVerifyBadge) {
+        emailVerifyBadge.textContent = 'VERIFICATION REQUIRED';
+        emailVerifyBadge.className = 'text-[9px] text-primary font-bold';
+      }
+      if (otpSendBtn) {
+        otpSendBtn.textContent = 'VERIFY EMAIL';
+        otpSendBtn.disabled = !checkEmailSyntaxValidity(regEmail?.value);
+      }
+      validateRegistrationForm();
+    }
+
+    async function handleSendOtp() {
+      const targetEmail = regEmail?.value.trim();
+      if (!checkEmailSyntaxValidity(targetEmail)) return;
+
+      if (otpSendBtn) {
+        otpSendBtn.textContent = 'SENDING...';
+        otpSendBtn.disabled = true;
+      }
+      if (otpResendBtn) {
+        otpResendBtn.disabled = true;
+        otpResendBtn.textContent = 'SENDING...';
+      }
+
+      // Immediately unhide OTP container so participant sees live feedback
+      if (otpInputContainer) otpInputContainer.classList.remove('hidden');
+      if (otpStatusMsg) {
+        otpStatusMsg.className = 'text-primary font-semibold text-xs animate-pulse';
+        otpStatusMsg.textContent = `Sending verification code to ${targetEmail}...`;
+      }
+
+      try {
+        const res = await fetch('/api/email/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: targetEmail })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          if (otpStatusMsg) {
+            otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+            otpStatusMsg.textContent = data.message || 'Unable to send verification code. Please check your email address or try again.';
+          }
+          if (otpSendBtn && !isEmailVerifiedState) {
+            otpSendBtn.textContent = 'VERIFY EMAIL';
+            otpSendBtn.disabled = false;
+          }
+          if (otpResendBtn) {
+            otpResendBtn.disabled = false;
+            otpResendBtn.textContent = 'RESEND OTP';
+          }
+          return;
+        }
+
+        if (otpStatusMsg) {
+          otpStatusMsg.className = 'text-emerald-400 font-semibold text-xs';
+          otpStatusMsg.textContent = `Verification code sent to ${targetEmail}. Check your inbox or spam.`;
+        }
+        if (otpSendBtn) {
+          otpSendBtn.textContent = 'OTP SENT ✓';
+          otpSendBtn.disabled = true;
+        }
+        if (otpCodeInput) {
+          otpCodeInput.value = '';
+          otpCodeInput.focus();
+        }
+
+        let secondsLeft = 600; // 10 minutes expiry
+        if (otpExpiryTimer) clearInterval(otpExpiryTimer);
+        otpExpiryTimer = setInterval(() => {
+          secondsLeft--;
+          if (secondsLeft <= 0) {
+            clearInterval(otpExpiryTimer);
+            if (otpTimerDisplay) otpTimerDisplay.textContent = 'EXPIRED';
+            if (otpStatusMsg) {
+              otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+              otpStatusMsg.textContent = 'This verification code has expired. Please request a new code.';
+            }
+          } else {
+            const m = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
+            const s = String(secondsLeft % 60).padStart(2, '0');
+            if (otpTimerDisplay) otpTimerDisplay.textContent = `OTP expires in ${m}:${s}`;
+          }
+        }, 1000);
+
+        let cooldownLeft = 30; // 30-second resend cooldown
+        if (otpResendBtn) {
+          otpResendBtn.disabled = true;
+          otpResendBtn.textContent = `RESEND IN ${cooldownLeft}S`;
+        }
+        if (otpCooldownTimer) clearInterval(otpCooldownTimer);
+        otpCooldownTimer = setInterval(() => {
+          cooldownLeft--;
+          if (cooldownLeft <= 0) {
+            clearInterval(otpCooldownTimer);
+            if (otpResendBtn) {
+              otpResendBtn.disabled = false;
+              otpResendBtn.textContent = 'RESEND OTP';
+            }
+          } else {
+            if (otpResendBtn) otpResendBtn.textContent = `RESEND IN ${cooldownLeft}S`;
+          }
+        }, 1000);
+
+      } catch (err) {
+        console.error('Send OTP Error:', err);
+        if (otpStatusMsg) {
+          otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+          otpStatusMsg.textContent = 'Network error sending verification code. Please try again.';
+        }
+        if (otpSendBtn && !isEmailVerifiedState) {
+          otpSendBtn.textContent = 'VERIFY EMAIL';
+          otpSendBtn.disabled = false;
+        }
+        if (otpResendBtn) {
+          otpResendBtn.disabled = false;
+          otpResendBtn.textContent = 'RESEND OTP';
+        }
+      }
+    }
+
+    if (otpSendBtn) otpSendBtn.addEventListener('click', handleSendOtp);
+    if (otpResendBtn) otpResendBtn.addEventListener('click', handleSendOtp);
+
+    if (otpCodeInput) {
+      otpCodeInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+      });
+    }
+
+    if (otpVerifyBtn) {
+      otpVerifyBtn.addEventListener('click', async () => {
+        const targetEmail = regEmail?.value.trim();
+        const enteredOtp = otpCodeInput?.value.trim();
+
+        if (!enteredOtp || enteredOtp.length !== 6) {
+          if (otpStatusMsg) {
+            otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+            otpStatusMsg.textContent = 'Please enter a valid 6-digit verification code.';
+          }
+          return;
+        }
+
+        otpVerifyBtn.disabled = true;
+        otpVerifyBtn.textContent = 'VERIFYING...';
+
+        try {
+          const res = await fetch('/api/email/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: targetEmail, otp: enteredOtp })
+          });
+          const data = await res.json();
+
+          if (res.ok && data.success && data.verified) {
+            isEmailVerifiedState = true;
+            verifiedEmailAddress = targetEmail.toLowerCase();
+
+            if (otpSectionActive) otpSectionActive.classList.add('hidden');
+            if (otpSectionVerified) otpSectionVerified.classList.remove('hidden');
+            if (emailVerifyBadge) {
+              emailVerifyBadge.textContent = '✓ VERIFIED';
+              emailVerifyBadge.className = 'text-[9px] text-emerald-400 font-bold';
+            }
+            if (otpExpiryTimer) clearInterval(otpExpiryTimer);
+            if (otpCooldownTimer) clearInterval(otpCooldownTimer);
+
+            validateRegistrationForm();
+          } else {
+            if (otpStatusMsg) {
+              otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+              otpStatusMsg.textContent = data.message || 'Incorrect verification code. Please try again.';
+            }
+            otpVerifyBtn.disabled = false;
+            otpVerifyBtn.textContent = 'VERIFY OTP';
+          }
+        } catch (err) {
+          console.error('Verify OTP Exception:', err);
+          if (otpStatusMsg) {
+            otpStatusMsg.className = 'text-red-400 font-semibold text-xs';
+            otpStatusMsg.textContent = 'Network error verifying code.';
+          }
+          otpVerifyBtn.disabled = false;
+          otpVerifyBtn.textContent = 'VERIFY OTP';
+        }
+      });
+    }
+
     function validateRegistrationForm() {
       const isNameValid = regName && regName.value.trim().length > 0;
-      const isEmailValid = regEmail && regEmail.value.trim().length > 0 && regEmail.value.includes('@');
+      const isEmailValid = regEmail && regEmail.value.trim().length > 0 && checkEmailSyntaxValidity(regEmail.value);
       const isPhoneValid = regPhone && regPhone.value.trim().length > 0;
       const isCollegeValid = regCollege && regCollege.value.trim().length > 0;
       const isTrackValid = regTrack && regTrack.value.trim().length > 0;
+      // OTP verification temporarily disabled for instant registration
+      const isVerified = true;
 
-      const isValid = isNameValid && isEmailValid && isPhoneValid && isCollegeValid && isTrackValid;
+      const isValid = isNameValid && isEmailValid && isPhoneValid && isCollegeValid && isTrackValid && isVerified;
 
       if (modalSubmitBtn) {
         modalSubmitBtn.disabled = !isValid;
@@ -1611,7 +1836,19 @@ const init = () => {
       return isValid;
     }
 
-    [regName, regEmail, regPhone, regCollege].forEach(input => {
+    if (regEmail) {
+      regEmail.addEventListener('input', () => {
+        if (isEmailVerifiedState && regEmail.value.trim().toLowerCase() !== verifiedEmailAddress) {
+          resetOtpVerificationState();
+        }
+        if (otpSendBtn && !isEmailVerifiedState) {
+          otpSendBtn.disabled = !checkEmailSyntaxValidity(regEmail.value);
+        }
+        validateRegistrationForm();
+      });
+    }
+
+    [regName, regPhone, regCollege].forEach(input => {
       if (input) {
         input.addEventListener('input', validateRegistrationForm);
       }
@@ -1948,8 +2185,9 @@ const init = () => {
                         email: resData.participant?.email || payload.email,
                         college: resData.participant?.college || payload.college,
                         selectedEvent: resData.participant?.selectedEvent || payload.selectedEvent,
-                        status: resData.status || 'REGISTERED',
-                        created_at: resData.created_at || new Date().toISOString()
+                        status: resData.status || 'CONFIRMED',
+                        created_at: resData.created_at || new Date().toISOString(),
+                        signed_credential: resData.signed_credential || null
                     };
 
                     sessionStorage.setItem('exousia_active_pass', JSON.stringify(passData));
@@ -2188,10 +2426,17 @@ const init = () => {
             ctx.textAlign = 'left';
 
             // Download Trigger
+            const cleanId = String(passId).replace(/[^A-Za-z0-9_-]/g, '_');
             const a = document.createElement('a');
-            a.download = `EXOUSIA_PASS_${passId}.png`;
+            a.download = `EXOUSIA_2K26_${cleanId}_ANOMALY_FILE.png`;
             a.href = canvas.toDataURL('image/png');
             a.click();
+
+            const feedbackEl = document.getElementById('pass-download-feedback');
+            if (feedbackEl) {
+                feedbackEl.textContent = '✓ ANOMALY FILE DOWNLOADED. Keep this file available on your phone for event entry.';
+                feedbackEl.className = 'text-center font-label-mono text-xs text-emerald-400 font-bold mt-2';
+            }
         });
     }
 

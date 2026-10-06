@@ -4,6 +4,8 @@
 
 import QRCode from 'qrcode';
 import { sendGmailEmail } from '../lib/gmail.js';
+import { generateDigitalPassSvg, generateDigitalPassPng } from '../lib/digital-pass.js';
+import { createSignedCredential } from '../lib/credential-signer.js';
 
 // Phase 4: Server-Side Rate Limiter (In-Memory Sliding Window per IP)
 const rateLimitMap = new Map();
@@ -69,10 +71,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { fullName, email, phone, college, selectedEvent } = req.body || {};
+    const { fullName, name, email, phone, college, selectedEvent } = req.body || {};
 
     // 1. Server-Side Input Normalization
-    const sanitizedName = (fullName || '').trim();
+    const sanitizedName = (fullName || name || '').trim();
     const sanitizedEmail = (email || '').trim().toLowerCase();
     const sanitizedPhone = (phone || '').trim();
     const sanitizedCollege = (college || '').trim();
@@ -268,7 +270,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           festival_id: 'e1801f5e-1a22-4a0b-8d07-8e6dfd158700',
           confirmation_code: finalRegId,
-          idempotency_key: `IDEM-${finalRegId}-${sanitizedEmail}`,
+          idempotency_key: `IDEM-${sanitizedEmail}-${normalizedTrack}`,
           registration_kind: 'event-only',
           primary_name: sanitizedName,
           primary_email: sanitizedEmail,
@@ -340,101 +342,71 @@ export default async function handler(req, res) {
         eventDate = 'October 1, 2026';
       }
 
-      const emailSubject = `EXOUSIA 2026 — Registration Confirmed | ${responseRegId}`;
+      const emailSubject = `EXOUSIA 2K26 — Registration Confirmed | ${responseRegId}`;
+      const passUrl = `https://exousia-vert.vercel.app/pass?id=${encodeURIComponent(responseRegId)}`;
+
       const emailTextBody = 
-`EXOUSIA 2026
+`EXOUSIA 2K26 — ANOMALY FILE GENERATED
 
 Your registration has been successfully confirmed.
 
-Registration ID:
-${responseRegId}
+YOUR ANOMALY FILE HAS BEEN GENERATED.
 
-Participant:
-${sanitizedName}
+Registration ID: ${responseRegId}
+Participant: ${sanitizedName}
+Event: ${normalizedTrack}
+College: ${sanitizedCollege}
+Venue: ${eventVenue}
+Date: ${eventDate}
 
-Event:
-${normalizedTrack}
-
-Venue:
-${eventVenue}
-
-Date:
-${eventDate}
-
-Please keep your Digital Pass ready when you arrive at EXOUSIA.
-
-Your Digital Pass is attached to this email.
+VIEW ANOMALY FILE:
+${passUrl}
 
 WELCOME TO EXOUSIA.
 
-EXOUSIA Team`;
+Department of Electrical & Electronics Engineering
+EXOUSIA 2K26 Team`;
 
       const emailHtmlBody = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"/></head>
-<body style="background-color:#0e0e0e; color:#e5e2e1; font-family:'Courier New',monospace; padding:24px;">
-  <div style="max-width:540px; margin:0 auto; background-color:#140e0f; border:1px solid #5a403c; border-radius:12px; padding:28px;">
-    <h2 style="color:#ffb4a8; font-size:22px; margin-top:0; letter-spacing:0.1em; text-transform:uppercase;">EXOUSIA 2026</h2>
-    <p style="font-size:14px; color:#e3beb8;">Your registration has been successfully confirmed.</p>
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+<body style="background-color:#050709; color:#F0F0F5; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; padding:24px; margin:0;">
+  <div style="max-width:540px; margin:0 auto; background-color:#0C0E12; border:1px solid #E50914; border-radius:16px; padding:32px; box-shadow:0 8px 32px rgba(229,9,20,0.2);">
     
-    <div style="background-color:#1c1415; border:1px solid #5a403c; border-radius:8px; padding:16px; margin:20px 0; font-size:13px; line-height:1.6;">
-      <p style="margin:4px 0;"><strong style="color:#ffb4a8;">Registration ID:</strong> <span style="color:#ffffff;">${responseRegId}</span></p>
-      <p style="margin:4px 0;"><strong style="color:#ffb4a8;">Participant:</strong> <span style="color:#ffffff;">${sanitizedName}</span></p>
-      <p style="margin:4px 0;"><strong style="color:#ffb4a8;">Event:</strong> <span style="color:#ffffff;">${normalizedTrack}</span></p>
-      <p style="margin:4px 0;"><strong style="color:#ffb4a8;">Venue:</strong> <span style="color:#ffffff;">${eventVenue}</span></p>
-      <p style="margin:4px 0;"><strong style="color:#ffb4a8;">Date:</strong> <span style="color:#ffffff;">${eventDate}</span></p>
+    <div style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px; margin-bottom:24px;">
+      <div style="color:#E50914; font-size:22px; font-weight:800; tracking-widest:2px; text-transform:uppercase;">EXOUSIA 2K26</div>
+      <div style="font-size:11px; color:#8D929A; text-transform:uppercase; margin-top:4px; font-family:monospace;">Department of EEE — Technical Festival</div>
     </div>
 
-    <p style="font-size:13px; color:#e3beb8;">Please keep your Digital Pass ready when you arrive at EXOUSIA.</p>
-    <p style="font-size:13px; color:#e3beb8;">Your Digital Pass verification link: <a href="https://exousia-vert.vercel.app/verify?id=${encodeURIComponent(responseRegId)}" style="color:#ffb4a8;">https://exousia-vert.vercel.app/verify?id=${responseRegId}</a></p>
-    <p style="font-size:13px; color:#e3beb8;">Your Digital Pass is attached to this email.</p>
+    <h2 style="color:#FFFFFF; font-size:20px; font-weight:800; margin:0 0 8px 0; text-transform:uppercase;">REGISTRATION CONFIRMED</h2>
+    <div style="display:inline-block; background-color:rgba(229,9,20,0.15); border:1px solid rgba(229,9,20,0.4); color:#E50914; font-size:11px; font-weight:700; font-family:monospace; padding:4px 10px; border-radius:6px; margin-bottom:20px;">
+      ● YOUR ANOMALY FILE HAS BEEN GENERATED
+    </div>
     
-    <h3 style="color:#ffb4a8; font-size:14px; margin-top:24px; letter-spacing:0.15em;">WELCOME TO EXOUSIA.</h3>
-    <p style="font-size:12px; color:#aa8984; margin-bottom:0;">EXOUSIA Team // Department of EEE</p>
+    <div style="background-color:#141A21; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:20px; margin-bottom:24px; font-size:13px; line-height:1.7; font-family:monospace;">
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">CASE ID:</strong> <span style="color:#FFFFFF; font-weight:700;">${responseRegId}</span></p>
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">SUBJECT:</strong> <span style="color:#FFFFFF;">${sanitizedName}</span></p>
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">ORIGIN:</strong> <span style="color:#FFFFFF;">${sanitizedCollege}</span></p>
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">ASSIGNED EVENT:</strong> <span style="color:#E50914; font-weight:700;">${normalizedTrack}</span></p>
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">VENUE:</strong> <span style="color:#F0F0F5;">${eventVenue}</span></p>
+      <p style="margin:4px 0;"><strong style="color:#8D929A;">EVENT DATE:</strong> <span style="color:#F0F0F5;">${eventDate}</span></p>
+    </div>
+
+    <div style="margin-bottom:24px; text-align:center;">
+      <a href="${passUrl}" style="display:block; width:100%; box-sizing:border-box; background-color:#E50914; color:#FFFFFF; text-decoration:none; font-weight:800; font-size:13px; font-family:monospace; text-transform:uppercase; padding:14px 20px; border-radius:10px; text-align:center;">
+        [ VIEW ANOMALY FILE ]
+      </a>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center; font-size:11px; color:#8D929A; font-family:monospace;">
+      <div style="font-weight:700; color:#F0F0F5;">WELCOME TO EXOUSIA</div>
+      <div>Department of Electrical &amp; Electronics Engineering</div>
+    </div>
+
   </div>
 </body>
 </html>`;
-
-      // Generate Digital Pass SVG Attachment
-      let passAttachmentBase64 = null;
-      try {
-        const verifyUrl = `https://exousia-vert.vercel.app/verify?id=${encodeURIComponent(responseRegId)}`;
-        const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
-          margin: 1,
-          color: { dark: '#ffb4a8', light: '#140e0f' },
-          width: 140
-        });
-
-        const escapeXml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-        const passSvgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="640" height="380" viewBox="0 0 640 380">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#221215" />
-      <stop offset="100%" stop-color="#0c0809" />
-    </linearGradient>
-  </defs>
-  <rect width="640" height="380" fill="url(#bg)" />
-  <rect x="12" y="12" width="616" height="356" fill="none" stroke="#ffb4a8" stroke-width="2" rx="8" />
-  
-  <text x="30" y="48" fill="#ffb4a8" font-family="monospace" font-weight="bold" font-size="13">EXOUSIA 2026 // PARTICIPANT CREDENTIAL</text>
-  <text x="30" y="95" fill="#ffffff" font-family="sans-serif" font-weight="bold" font-size="24">${escapeXml(sanitizedName.toUpperCase())}</text>
-  <text x="30" y="125" fill="#c5a4a0" font-family="monospace" font-size="14">${escapeXml(sanitizedCollege)}</text>
-  <text x="30" y="190" fill="#ffb4a8" font-family="monospace" font-weight="bold" font-size="18">REG ID: ${escapeXml(responseRegId)}</text>
-  <text x="30" y="225" fill="#e5e2e1" font-family="monospace" font-size="14">EVENT: ${escapeXml(normalizedTrack)}</text>
-  <text x="30" y="260" fill="#4ade80" font-family="monospace" font-weight="bold" font-size="14">STATUS: CONFIRMED</text>
-  <text x="30" y="330" fill="#ffb4a8" font-family="monospace" font-size="11">DATE: ${escapeXml(eventDate)} | VENUE: ${escapeXml(eventVenue)}</text>
-  
-  <image href="${qrDataUrl}" xlink:href="${qrDataUrl}" x="460" y="40" width="140" height="140" />
-  <text x="500" y="200" fill="#ffb4a8" font-family="monospace" font-size="10">QR VERIFY</text>
-</svg>`.trim();
-
-        passAttachmentBase64 = Buffer.from(passSvgContent).toString('base64');
-      } catch (passErr) {
-        console.warn('Pass SVG attachment generation error:', passErr);
-      }
 
       // 5a. Create Outbox Record FIRST (Status: pending)
       let outboxRowId = null;
@@ -468,24 +440,16 @@ EXOUSIA Team`;
         }
       }
 
-      // 5b. Attempt Gmail API Transmission
+      // 5b. Attempt Gmail API Transmission (No image attachment required)
       let emailSent = false;
       let emailErrorMsg = null;
-
-      const attachments = passAttachmentBase64 ? [
-        {
-          filename: `EXOUSIA_Digital_Pass_${responseRegId}.svg`,
-          content: passAttachmentBase64,
-          contentType: 'image/svg+xml'
-        }
-      ] : [];
 
       const gmailResult = await sendGmailEmail({
         to: sanitizedEmail,
         subject: emailSubject,
         html: emailHtmlBody,
         text: emailTextBody,
-        attachments
+        attachments: []
       });
 
       emailSent = gmailResult.success;
@@ -513,6 +477,21 @@ EXOUSIA Team`;
       console.warn('Non-blocking Email Dispatch Error:', emailOutboxError);
     }
 
+    // 5d. Generate Cryptographically Signed Event Credential
+    let signedCredential = null;
+    try {
+      signedCredential = createSignedCredential({
+        registrationId: responseRegId,
+        name: confirmedRecord.primary_name || sanitizedName,
+        college: confirmedRecord.primary_college || sanitizedCollege,
+        event: confirmedRecord.team_name || normalizedTrack,
+        status: confirmedRecord.status || 'confirmed',
+        created_at: confirmedRecord.created_at || createdAt
+      });
+    } catch (credErr) {
+      console.warn('Non-blocking signed credential generation error:', credErr);
+    }
+
     // 6. Structured 201 Created Success Response
     return res.status(201).json({
       success: true,
@@ -525,6 +504,7 @@ EXOUSIA Team`;
         college: confirmedRecord.primary_college || sanitizedCollege,
         selectedEvent: confirmedRecord.team_name || normalizedTrack
       },
+      signed_credential: signedCredential,
       message: 'Registration successfully recorded in EXOUSIA database.'
     });
 

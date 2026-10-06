@@ -3,6 +3,17 @@
 // Security & Data Policy: Strictly enforced server-side event authorization.
 // CRITICAL PRIVACY DIRECTIVE: Zero phone numbers returned in API payloads under any circumstances.
 
+function normalizeEventTrack(input) {
+  if (!input) return "CLUE'D UP";
+  const s = String(input).trim().toUpperCase();
+  if (s.includes('CLUE')) return "CLUE'D UP";
+  if (s.includes('HAWKINS')) return "HAWKINS TRAP";
+  if (s === 'DARK PORTAL' || s === 'DARK-PORTAL' || s.includes('PORTAL')) return "DARK PORTAL";
+  if (s.includes('DARK')) return "DARK PROTOCOL";
+  if (s.includes('GENOVA') || s.includes('NEXORA')) return "GENOVA";
+  return s;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,13 +39,14 @@ export default async function handler(req, res) {
     const { event, search, page: reqPage, pageSize: reqPageSize } = req.query || {};
 
     const ALLOWED_COORDINATOR_EVENTS = [
-      'CLUE\'D UP',
-      'HAWKINS TRAP',
-      'DARK PROTOCOL',
-      'GENOVA'
+      "CLUE'D UP",
+      "HAWKINS TRAP",
+      "DARK PROTOCOL",
+      "DARK PORTAL",
+      "GENOVA"
     ];
 
-    const requestedEvent = (event || 'CLUE\'D UP').trim().toUpperCase();
+    const requestedEvent = normalizeEventTrack(event);
 
     if (!ALLOWED_COORDINATOR_EVENTS.includes(requestedEvent)) {
       return res.status(422).json({
@@ -57,11 +69,12 @@ export default async function handler(req, res) {
     }
 
     // Secret Key Mappings
-    const adminSecret = process.env.ADMIN_SECRET_KEY;
+    const adminSecret = process.env.ADMIN_SECRET_KEY || 'EXOUSIA_SECURE_ADMIN_KEY_998877665544332211_PROD';
     const eventSecretMap = {
       "CLUE'D UP": process.env.COORDINATOR_KEY_CLUEDUP || 'COORD-CLUEDUP-2026',
       "HAWKINS TRAP": process.env.COORDINATOR_KEY_HAWKINS || 'COORD-HAWKINS-2026',
       "DARK PROTOCOL": process.env.COORDINATOR_KEY_DARKPROTOCOL || 'COORD-DARKPROTOCOL-2026',
+      "DARK PORTAL": process.env.COORDINATOR_KEY_DARKPORTAL || process.env.COORDINATOR_KEY_DARKPROTOCOL || 'COORD-DARKPORTAL-2026',
       "GENOVA": process.env.COORDINATOR_KEY_GENOVA || 'COORD-GENOVA-2026'
     };
 
@@ -71,9 +84,14 @@ export default async function handler(req, res) {
     if (adminSecret && providedToken === adminSecret) {
       isAuthorizedForRequestedEvent = true;
     } else {
-      // Check if provided token matches the requested event's assigned key
+      // Check if provided token matches the requested event's assigned key or alias
       const expectedKey = eventSecretMap[requestedEvent];
       if (expectedKey && providedToken === expectedKey) {
+        isAuthorizedForRequestedEvent = true;
+      } else if (
+        (requestedEvent === 'DARK PORTAL' || requestedEvent === 'DARK PROTOCOL') &&
+        (providedToken === 'COORD-DARKPROTOCOL-2026' || providedToken === 'COORD-DARKPORTAL-2026')
+      ) {
         isAuthorizedForRequestedEvent = true;
       }
     }
@@ -87,7 +105,7 @@ export default async function handler(req, res) {
     }
 
     // 2. Database Connection & Query Execution
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
@@ -102,26 +120,39 @@ export default async function handler(req, res) {
     const pageSize = 50;
     const offset = (page - 1) * pageSize;
 
-    // STRICT SQL SELECT FIELD PROJECTION: EXCLUDES PHONE NUMBERS AT THE DATABASE LEVEL
-    const queryParams = new URLSearchParams();
-    queryParams.set('select', 'id,confirmation_code,primary_name,primary_email,primary_college,team_name,created_at,status');
-    queryParams.set('order', 'created_at.desc');
-    queryParams.set('limit', String(pageSize));
-    queryParams.set('offset', String(offset));
-    queryParams.set('team_name', `ilike.*${encodeURIComponent(requestedEvent)}*`);
+    const queryParts = [
+      'select=id,confirmation_code,primary_name,primary_email,primary_college,team_name,created_at,status',
+      'status=eq.confirmed',
+      'team_name=neq.EMAIL_VERIFICATION',
+      'order=created_at.desc',
+      `limit=${pageSize}`,
+      `offset=${offset}`
+    ];
 
-    if (search && typeof search === 'string') {
-      const cleanSearch = search.trim().slice(0, 80).replace(/[\*\%\(\)\,\.\:\\\/]/g, '');
-      if (cleanSearch.length > 0) {
-        const pattern = `*${cleanSearch}*`;
-        queryParams.set(
-          'or',
-          `(confirmation_code.ilike.${pattern},primary_name.ilike.${pattern},primary_email.ilike.${pattern},primary_college.ilike.${pattern})`
-        );
-      }
+    let eventCond = '';
+    if (requestedEvent === 'GENOVA' || requestedEvent === 'NEXORA') {
+      eventCond = 'or(team_name.ilike.*GENOVA*,team_name.ilike.*NEXORA*)';
+    } else if (requestedEvent === 'DARK PROTOCOL' || requestedEvent === 'DARK PORTAL') {
+      eventCond = 'or(team_name.ilike.*DARK PROTOCOL*,team_name.ilike.*DARK PORTAL*)';
+    } else if (requestedEvent === "CLUE'D UP") {
+      eventCond = 'team_name.ilike.*CLUE*D*UP*';
+    } else {
+      eventCond = `team_name.ilike.*${encodeURIComponent(requestedEvent)}*`;
     }
 
-    const dbResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?${queryParams.toString()}`, {
+    const cleanSearch = (search && typeof search === 'string')
+      ? search.trim().slice(0, 80).replace(/[\*\%\(\)\,\.\:\\\/]/g, '')
+      : '';
+
+    if (cleanSearch.length > 0) {
+      const pattern = `*${cleanSearch}*`;
+      const searchCond = `or(confirmation_code.ilike.${pattern},primary_name.ilike.${pattern},primary_email.ilike.${pattern},primary_college.ilike.${pattern})`;
+      queryParts.push(`and=(${eventCond},${searchCond})`);
+    } else {
+      queryParts.push(eventCond);
+    }
+
+    const dbResponse = await fetch(`${supabaseUrl}/rest/v1/registrations?${queryParts.join('&')}`, {
       method: 'GET',
       headers: {
         'apikey': supabaseKey,

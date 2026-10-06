@@ -773,10 +773,16 @@ export default function RegistrationWizard() {
                 Your registration entry is recorded in the EXOUSIA active microgrid database. A confirmation logs email has been queued in the outbox to <span className="text-text-primary font-bold">{formValues.primaryParticipant.email}</span>.
               </p>
 
-              <div className="pt-4">
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={`/pass?id=${encodeURIComponent(confirmationCode)}`}
+                  className="px-6 py-2.5 bg-accent border border-accent text-white font-tech font-bold text-xs tracking-widest hover:bg-accent/80 transition-all duration-300 shadow-accent-glow cursor-pointer inline-block uppercase"
+                >
+                  [ VIEW ANOMALY FILE ]
+                </a>
                 <Link
                   href="/events"
-                  className="px-6 py-2.5 bg-accent/15 border border-accent text-accent font-tech font-bold text-xs tracking-widest hover:bg-accent/25 transition-all duration-300 shadow-accent-glow cursor-pointer inline-block"
+                  className="px-6 py-2.5 bg-bg-secondary border border-border text-text-primary font-tech font-bold text-xs tracking-widest hover:border-accent transition-all duration-300 cursor-pointer inline-block uppercase"
                 >
                   [ DISCOVER OTHER LABS ]
                 </Link>

@@ -14,6 +14,7 @@ export default defineConfig({
         verify: resolve(__dirname, 'verify.html'),
         coordinator: resolve(__dirname, 'coordinator.html'),
         feedback: resolve(__dirname, 'feedback.html'),
+        pass: resolve(__dirname, 'pass.html'),
         audioTest: resolve(__dirname, 'audio-test.html')
       }
     }

@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     }
 
     // Query Supabase for minimal verification columns ONLY (Privacy Boundary)
-    const selectFields = 'confirmation_code,primary_name,primary_college,team_name,registration_kind,status';
+    const selectFields = 'confirmation_code,primary_name,primary_college,team_name,registration_kind,status,created_at';
     const encodedId = encodeURIComponent(regId);
     const dbResponse = await fetch(
       `${supabaseUrl}/rest/v1/registrations?confirmation_code=eq.${encodedId}&select=${selectFields}`,
@@ -106,6 +106,16 @@ export default async function handler(req, res) {
 
     const record = records[0];
 
+    // Exclude EMAIL_VERIFICATION placeholder records or non-confirmed registrations
+    if (record.team_name === 'EMAIL_VERIFICATION' || (record.status || '').toLowerCase() !== 'confirmed') {
+      return res.status(200).json({
+        success: true,
+        valid: false,
+        code: 'REGISTRATION_NOT_CONFIRMED',
+        message: 'This registration is not confirmed or is an incomplete verification request.'
+      });
+    }
+
     // Minimal verification response (Privacy Boundary Enforcement)
     return res.status(200).json({
       success: true,
@@ -115,7 +125,8 @@ export default async function handler(req, res) {
         full_name: record.primary_name || 'Participant',
         college: record.primary_college || 'Institution',
         selected_event: record.team_name || record.registration_kind || 'Official Event',
-        status: (record.status || 'confirmed').toUpperCase()
+        status: (record.status || 'confirmed').toUpperCase(),
+        created_at: record.created_at || null
       }
     });
 
